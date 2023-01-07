@@ -9,9 +9,10 @@ class Vector3 {
 }
 
 class StarRecord {
-    constructor(name, position) {
+    constructor(name, position, type) {
         this.name = name;
         this.position = position;
+        this.type = type;
     }
 }
 
@@ -54,10 +55,16 @@ class StarParser {
             const name = nameBuffer.toString('utf16le');
             index += nameLen * 2;
 
+            // Skip more bytes
+            index += 20;
+            
+            const type = rawStarData.readIntBE(index, 4);
+            index += 4;
+            
             // Skip rest of the bytes
-            index += 77
+            index += 53
 
-            let star = new StarRecord(name, position);
+            let star = new StarRecord(name, position, type);
             stars.push(star);
         }
         return stars;

@@ -1,7 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
-import { FlyControls } from 'FlyControls';
-import { SphereGeometry } from 'three';
 
 // Handle uploading file to server when selected
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -44,21 +42,57 @@ function drawStarPoints(starRecords=[]) {
     console.log("Drawing star points");
     
     // Set up star points geometry
-    let points = [];
+    let stars = [];
     starRecords.forEach(record => {
-        points.push(new THREE.Vector3(record.position.x, record.position.y, record.position.z));
+        let position = new THREE.Vector3(record.position.x, record.position.y, record.position.z);
+        let type = record.type;
+        stars.push({
+            position: position,
+            type: type
+        });
     });
 
+    const whiteStarMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    const redStarMaterial = new THREE.MeshBasicMaterial({ color: 0xd36956 });
+    const yellowStarMaterial = new THREE.MeshBasicMaterial({ color: 0xe5bd72 });
+    const blueStarMaterial = new THREE.MeshBasicMaterial({ color: 0x64b3fc });
+    const binaryStarMaterial = new THREE.MeshBasicMaterial({ color: 0xd1d1f6 });
+    const blackHoleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000FF });
+    const protoDiskMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
 
-    const starMaterial = new THREE.MeshBasicMaterial({
-        color: 0xFFFFFF
-    });
+    const starGeometry = new THREE.SphereGeometry(0.3, 8, 8);
 
-    const starGeometry = new THREE.SphereGeometry(0.4, 8, 8);
-
-    points.forEach(point => {
-        const sphere = new THREE.Mesh(starGeometry, starMaterial);
-        sphere.position.set(point.x, point.z * 2, -point.y);
+    stars.forEach(star => {
+        let material = whiteStarMaterial;
+        switch (star.type) {
+            case 6: // red
+            case 12: // red-red
+                material = redStarMaterial
+                break;
+            case 4: // yellow
+            case 10: // yellow-yellow
+                material = yellowStarMaterial;
+                break;
+            case 5: // blue
+            case 7: // blue-blue
+                material = blueStarMaterial;
+                break;
+            case 2: // black hole
+                material = blackHoleMaterial;
+                break;
+            case 3: // proto-planetary disk
+                material = protoDiskMaterial;
+                break;
+            case 8:
+            case 9:
+            case 11:
+                material = binaryStarMaterial;
+                break;
+            default:
+                break;
+        }
+        const sphere = new THREE.Mesh(starGeometry, material);
+        sphere.position.set(star.position.x, star.position.z * 2, -star.position.y);
         scene.add(sphere);
     });
 
