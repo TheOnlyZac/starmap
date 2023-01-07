@@ -36,9 +36,9 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     white-space: nowrap;
 
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.66);
 
-    border: 2px solid rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 4px;
 
     user-select: none;
