@@ -66,4 +66,5 @@ app.post('/example-star-records', (req, res) => {
 // Start the server
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+  console.log(`Open localhost:${port} in your web browser`);
 });
