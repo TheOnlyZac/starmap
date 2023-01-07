@@ -30,7 +30,7 @@ class StarParser {
         let stars = [];
         
         let index = 0;
-        while (index < rawStarData.length) {
+        while (index < rawStarData.byteLength) {
             // Skip bytes
             index += 136;
 

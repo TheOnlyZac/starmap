@@ -6,6 +6,7 @@ const path = require('path');
 const multer = require('multer');
 const upload = multer();
 
+const fs = require('fs');
 const StarParser = require('./stars')
 
 // Set the port to listen on
@@ -22,20 +23,43 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+function deserializeStarRecords(data) {
+  // Process the data as needed
+  starParser = new StarParser();
+  const parsedData = starParser.deserialize(data);
+  return parsedData;
+}
+
 // Set up routes to handle JSON data and serve static assets
 app.post('/process-star-data', upload.single('file'), (req, res) => {
   // Access the file data in the request body
   const file = req.file;
 
   // Read the binary data in the file object
-  const data = file.buffer;
+  const buffer = file.buffer;
 
-  // Process the data as needed
-  starParser = new StarParser();
-  const parsedData = starParser.deserialize(data);
+  // Deserialize star records
+  starRecords = deserializeStarRecords(buffer);
 
   // Send a response to the client
-  res.send({ status: 'success', data: parsedData });
+  res.send({ status: 'success', data: starRecords });
+});
+
+app.post('/example-star-records', (req, res) => {
+  // Open example star record file
+  fs.readFile('stars.bin', (err, fd) => {
+    if (err) {
+      console.error(err);
+      res.send({ status: '500' });
+      return;
+    }
+
+    // Deserialize star records
+    starRecords = deserializeStarRecords(fd);
+
+    // Send a response to the client
+    res.send({ status: 'success', data: starRecords });
+  });
 });
 
 // Start the server

@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
         const file = event.target.files[0];
         console.log("Uploading file " + file.name);
 
-        processStarRecords(file)
+        uploadStarRecordsFile(file)
     });
 });
 
-function processStarRecords(file) {
+function uploadStarRecordsFile(file) {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -91,7 +91,11 @@ scene.add(cube); */
 // Request sample star data from server
 var req = new XMLHttpRequest();
 req.onload = function(){
-    console.log(this.responseText);
+    const response = JSON.parse(this.response);
+    console.log(response);
+    if (response.status == 'success') {
+        drawStarPoints(response.data);
+    }
 };
 req.open('POST', 'example-star-records');
 req.send();
