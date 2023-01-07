@@ -72,7 +72,7 @@ var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.far = 2500
+camera.far = 3500
 camera.position.x = 500;
 camera.position.y = 400;
 camera.position.z = 500;
@@ -81,6 +81,20 @@ camera.updateProjectionMatrix();
 var controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.screenSpacePanning = false;
+
+// Setup skybox
+var texName = 'img/starfield.png'
+var skyTextures = [
+    texName,
+    texName,
+    texName,
+    texName,
+    texName,
+    texName,
+];
+
+var textureCube = new THREE.CubeTextureLoader().load(skyTextures);
+scene.background = textureCube;
 
 // Request sample star data from server
 var req = new XMLHttpRequest();
@@ -96,8 +110,9 @@ req.send();
 
 // Render the scene
 function render() {
-    requestAnimationFrame(render);
     controls.update();
+
+    requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
 render();
