@@ -1,5 +1,6 @@
 # StarMap
 
+<img src="/thumb.gif" alt="A screenshot of the map viewer." align="right" style="float: right; margin: 10px; width: 400px">
 An interactive 3D map of the Spore galaxy. The data comes from `stars.db`, which is where the game stores information about generated star systems.
 
 ## Getting Started
@@ -7,7 +8,7 @@ An interactive 3D map of the Spore galaxy. The data comes from `stars.db`, which
 1. Clone the repo
 2. Install dependencies with `npm install`
 3. Start the server with `npm start`
-3. Open (localhost:3000)[localhost:3000] in a web browser
+3. Open [localhost:3000](localhost:3000) in a web browser
 
 ## Controls
 
