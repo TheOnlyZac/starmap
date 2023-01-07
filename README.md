@@ -13,4 +13,4 @@ Control the camera using the mouse.
 * The galaxy is naturally very flat, so the y-axis is inflated in the renderer to make the stars appear slightly more spread-out.
 
 ## Attribution
-Skybox textures courtesy of Screaming Brain Studios on opengameart.org [https://opengameart.org/content/seamless-space-backgrounds]
+Skybox textures courtesy of Screaming Brain Studios on OpenGameArt ([source](https://opengameart.org/content/seamless-space-backgrounds))
