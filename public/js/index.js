@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     });
 });
 
+// Upload star records file to be processed by the server
 function uploadStarRecordsFile(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -38,6 +39,13 @@ function uploadStarRecordsFile(file) {
         });
 }
 
+// Convert rgb values to hex
+function rgbToHex(r, g, b) {
+    let hex = (r << 16) + (g << 8) + b;
+    return hex;
+}
+
+// Draw mesh for each star in the star records
 function drawStarPoints(starRecords = []) {
     console.log("Drawing star points");
 
@@ -48,7 +56,8 @@ function drawStarPoints(starRecords = []) {
         stars.push({
             name: record.name,
             position: position,
-            type: record.type
+            type: record.type,
+            unk: record.unk10
         });
     });
 
@@ -91,6 +100,8 @@ function drawStarPoints(starRecords = []) {
             default:
                 break;
         }
+
+        //material = new THREE.MeshBasicMaterial({ color: star.color }); // temp
         const mesh = new THREE.Mesh(starGeometry, material);
         mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
         mesh.userData = { name: star.name };
