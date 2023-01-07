@@ -15,7 +15,7 @@ const port = 3000;
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Parse incoming JSON requests and make the contents available in the request body
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 
 // Set up the root route
 app.get('/', (req, res) => {
@@ -33,10 +33,9 @@ app.post('/process-star-data', upload.single('file'), (req, res) => {
   // Process the data as needed
   starParser = new StarParser();
   const parsedData = starParser.deserialize(data);
-  console.log(parsedData);
 
   // Send a response to the client
-  res.send({ status: 'success', data: data });
+  res.send({ status: 'success', data: parsedData });
 });
 
 // Start the server
