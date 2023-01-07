@@ -52,11 +52,11 @@ function drawStarPoints(starRecords=[]) {
     const pointsMaterial = new THREE.MeshBasicMaterial({
         color: 0xFFFFFF
     });
-    const pointsGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+    const pointsGeometry = new THREE.SphereGeometry(0.4, 8, 8);
 
     points.forEach(point => {
         const sphere = new THREE.Mesh(pointsGeometry, pointsMaterial);
-        sphere.position.set(point.x, point.z, -point.y);
+        sphere.position.set(point.x, point.z * 2, -point.y);
         scene.add(sphere);
     });
 
@@ -72,21 +72,15 @@ var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.far = 1
-
-camera.position.x = 200;
-camera.position.y = 200;
-camera.position.z = 200;
-camera.lookAt(0, 0, 0);
+camera.far = 2500
+camera.position.x = 500;
+camera.position.y = 400;
+camera.position.z = 500;
+camera.updateProjectionMatrix();
 
 var controls = new OrbitControls(camera, renderer.domElement);
-
-// Add test cube at origin
-/* const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-var cube = new THREE.Mesh(cubeGeometry, material);
-scene.add(cube); */
+controls.enableDamping = true;
+controls.screenSpacePanning = false;
 
 // Request sample star data from server
 var req = new XMLHttpRequest();
@@ -103,6 +97,7 @@ req.send();
 // Render the scene
 function render() {
     requestAnimationFrame(render);
+    controls.update();
     renderer.render(scene, camera);
 }
 render();
