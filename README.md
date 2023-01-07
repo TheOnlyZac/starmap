@@ -8,7 +8,7 @@ An interactive 3D map of the Spore galaxy. The data comes from `stars.db`, which
 1. Clone the repo
 2. Install dependencies with `npm install`
 3. Start the server with `npm start`
-3. Open [localhost:3000](localhost:3000) in a web browser
+3. Open `localhost:3000` in a web browser
 
 ## Controls
 
@@ -16,10 +16,11 @@ Control the camera using the mouse.
 * **Left Click + Drag** to rotate
 * **Right Click + Drag** to pan
 * **Scroll Wheel** to zoom in/out
+* **Hover the mouse** over a star to view its name
 
 ## Notes
 
-* Each dot is a single star system, black holes, or proto-planetary disk. 
+* Each dot is a single star system, black hole, or proto-planetary disk. 
 * The galaxy is naturally very flat, so the y-axis is inflated in the renderer to make the stars appear slightly more spread-out.
 
 ## Attribution
