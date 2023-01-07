@@ -3,9 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Hello three.js</title>
-		<style>
-			body { margin: 0; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 
 		<script type="importmap">
 			{
@@ -19,8 +17,12 @@
 	<body>
 		<script src="js/form.js"></script>
 		<script type="module" src="js/index.js"></script>
-		<form>
-			<input id="file-input" type="file">
-		</form>
+
+		<div id="content">
+			<h1>Upload star records</h1>
+			<form id="file-form">
+				<input id="file-input" type="file">
+			</form>
+		</div>
 	</body>
 </html>
