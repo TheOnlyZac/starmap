@@ -25,3 +25,24 @@ canvas {
 h1, h2, h3, h4, h5, h6 {
     margin: 4px 0px 4px 0px;
 }
+
+#tooltip {
+    position: absolute;
+
+    padding: 2px 4px 2px 4px;
+    min-width: 33px;
+    min-height: 10px;
+
+    color: white;
+    white-space: nowrap;
+
+    background-color: rgba(0, 0, 0, 0.5);
+
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+
+    user-select: none;
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 1;
+}

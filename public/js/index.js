@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 
 // Handle uploading file to server when selected
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function (event) {
     const fileInput = document.querySelector('#file-input');
 
     // Clear file input value on click
@@ -38,29 +38,29 @@ function uploadStarRecordsFile(file) {
         });
 }
 
-function drawStarPoints(starRecords=[]) {
+function drawStarPoints(starRecords = []) {
     console.log("Drawing star points");
-    
+
     // Set up star points geometry
     let stars = [];
     starRecords.forEach(record => {
         let position = new THREE.Vector3(record.position.x, record.position.y, record.position.z);
-        let type = record.type;
         stars.push({
+            name: record.name,
             position: position,
-            type: type
+            type: record.type
         });
     });
 
-    const whiteStarMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
-    const redStarMaterial = new THREE.MeshBasicMaterial({ color: 0xd36956 });
-    const yellowStarMaterial = new THREE.MeshBasicMaterial({ color: 0xe5bd72 });
-    const blueStarMaterial = new THREE.MeshBasicMaterial({ color: 0x64b3fc });
-    const binaryStarMaterial = new THREE.MeshBasicMaterial({ color: 0xd1d1f6 });
-    const blackHoleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000FF });
-    const protoDiskMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+    const whiteStarMaterial =   new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    const redStarMaterial =     new THREE.MeshBasicMaterial({ color: 0xd36956 });
+    const yellowStarMaterial =  new THREE.MeshBasicMaterial({ color: 0xe5bd72 });
+    const blueStarMaterial =    new THREE.MeshBasicMaterial({ color: 0x64b3fc });
+    const binaryStarMaterial =  new THREE.MeshBasicMaterial({ color: 0xd1d1f6 });
+    const blackHoleMaterial =   new THREE.MeshBasicMaterial({ color: 0x0000FF });
+    const protoDiskMaterial =   new THREE.MeshBasicMaterial({ color: 0xFF0000 });
 
-    const starGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+    const starGeometry = new THREE.SphereGeometry(0.3, 6, 4);
 
     stars.forEach(star => {
         let material = whiteStarMaterial;
@@ -91,12 +91,21 @@ function drawStarPoints(starRecords=[]) {
             default:
                 break;
         }
-        const sphere = new THREE.Mesh(starGeometry, material);
-        sphere.position.set(star.position.x, star.position.z * 2, -star.position.y);
-        scene.add(sphere);
+        const mesh = new THREE.Mesh(starGeometry, material);
+        mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
+        mesh.userData = { name: star.name };
+        scene.add(mesh);
     });
 
     console.log("done");
+}
+
+// Pointer move event listener
+function onPointerMove(event) {
+
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
 }
 
 // Set up a basic scene
@@ -118,6 +127,12 @@ var controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.screenSpacePanning = false;
 
+var raycaster = new THREE.Raycaster();
+var tooltip = document.querySelector('#tooltip');
+
+const pointer = new THREE.Vector2();
+document.addEventListener('mousemove', onPointerMove);
+
 // Setup skybox
 var texName = 'img/starfield.png'
 var skyTextures = [
@@ -134,7 +149,7 @@ scene.background = textureCube;
 
 // Request sample star data from server
 var req = new XMLHttpRequest();
-req.onload = function(){
+req.onload = function () {
     const response = JSON.parse(this.response);
     console.log(response);
     if (response.status == 'success') {
@@ -146,7 +161,23 @@ req.send();
 
 // Render the scene
 function render() {
+    // Update camera controls
     controls.update();
+
+    // Cast ray from camera
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(scene.children, false);
+
+    if (intersects.length > 0) {
+        let starName = intersects[0].object.userData.name;
+
+        tooltip.style.visibility = 'visible';
+        tooltip.style.left = (pointer.x + 1) / 2 * window.innerWidth + 5 + 'px';
+        tooltip.style.top = (-pointer.y + 1) / 2 * window.innerHeight - 30 + 'px';
+        tooltip.innerHTML = starName;
+    } else {
+        tooltip.style.visibility = 'hidden';
+    }
 
     requestAnimationFrame(render);
     renderer.render(scene, camera);
