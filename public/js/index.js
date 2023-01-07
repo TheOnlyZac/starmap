@@ -49,13 +49,15 @@ function drawStarPoints(starRecords=[]) {
         points.push(new THREE.Vector3(record.position.x, record.position.y, record.position.z));
     });
 
-    const pointsMaterial = new THREE.MeshBasicMaterial({
+
+    const starMaterial = new THREE.MeshBasicMaterial({
         color: 0xFFFFFF
     });
-    const pointsGeometry = new THREE.SphereGeometry(0.4, 8, 8);
+
+    const starGeometry = new THREE.SphereGeometry(0.4, 8, 8);
 
     points.forEach(point => {
-        const sphere = new THREE.Mesh(pointsGeometry, pointsMaterial);
+        const sphere = new THREE.Mesh(starGeometry, starMaterial);
         sphere.position.set(point.x, point.z * 2, -point.y);
         scene.add(sphere);
     });

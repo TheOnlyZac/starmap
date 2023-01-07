@@ -42,6 +42,7 @@ class StarParser {
 
             const position = new Vector3(x, y, z);
 
+            // Skip more bytes
             index += 8;
 
             // Read name length (4-byte int)
@@ -53,7 +54,7 @@ class StarParser {
             const name = nameBuffer.toString('utf16le');
             index += nameLen * 2;
 
-            // Skip rest of the data
+            // Skip rest of the bytes
             index += 77
 
             let star = new StarRecord(name, position);
