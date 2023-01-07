@@ -47,7 +47,8 @@ app.post('/process-star-data', upload.single('file'), (req, res) => {
 
 app.post('/example-star-records', (req, res) => {
   // Open example star record file
-  fs.readFile('stars.bin', (err, fd) => {
+  fname = path.join(__dirname, 'public/stars.bin');
+  fs.readFile(fname, (err, fd) => {
     if (err) {
       console.error(err);
       res.send({ status: '500' });

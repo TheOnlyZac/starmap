@@ -23,5 +23,10 @@
     "visualizaion"
   ],
   "author": "TheOnlyZac",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "pkg": {
+    "scripts": [ "*.js" ],
+    "assets": [ "public/**/*" ],
+    "outputPath": "build"
+  }
 }
