@@ -134,6 +134,14 @@ camera.position.y = 400;
 camera.position.z = 500;
 camera.updateProjectionMatrix();
 
+// Resize renderer on window resize
+window.addEventListener('resize', (event) => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+});
+
 var controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.screenSpacePanning = false;
