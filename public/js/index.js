@@ -104,19 +104,15 @@ function drawStarPoints(starRecords = []) {
         //material = new THREE.MeshBasicMaterial({ color: star.color }); // temp
         const mesh = new THREE.Mesh(starGeometry, material);
         mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
-        mesh.userData = { name: star.name };
+        mesh.userData = star;
         scene.add(mesh);
     });
-
-    console.log("done");
 }
 
 // Pointer move event listener
 function onPointerMove(event) {
-
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
 }
 
 // Set up a basic scene
@@ -129,9 +125,7 @@ scene.background = new THREE.Color(0x000000);
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.far = 3500
-camera.position.x = 500;
-camera.position.y = 400;
-camera.position.z = 500;
+camera.position.set(50, 100, 50);
 camera.updateProjectionMatrix();
 
 // Resize renderer on window resize
@@ -187,15 +181,23 @@ function render() {
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObjects(scene.children, false);
 
+    // Check if raycast hit a star
     if (intersects.length > 0) {
         let starName = intersects[0].object.userData.name;
 
+        // Show tooltip with star name on mouseover
         tooltip.style.visibility = 'visible';
         tooltip.style.left = (pointer.x + 1) / 2 * window.innerWidth + 5 + 'px';
         tooltip.style.top = (-pointer.y + 1) / 2 * window.innerHeight - 30 + 'px';
         tooltip.innerHTML = starName;
+
+        document.body.style.cursor = 'help';
+    
+        // Show properties panel on click
+
     } else {
         tooltip.style.visibility = 'hidden';
+        document.body.style.cursor = 'auto';
     }
 
     requestAnimationFrame(render);

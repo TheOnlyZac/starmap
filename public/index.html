@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<title>StarMap</title>
 		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" type="text/css" href="css/gui.css">
 
 		<script type="importmap">
 			{
@@ -17,12 +18,28 @@
 	</head>
 	<body>
 		<script type="module" src="js/index.js"></script>
+		<script type="module" src="js/gui.js"></script>
 		<div id="content">
 			<div id="tooltip">Galactic Core</div>
+			
 			<!--<h1>Upload star records</h1>
 			<form id="file-form">
 				<input id="file-input" type="file">
 			</form>-->
+
+			<div id="properties-Treus-8" class="panel properties">
+				<h1 class="panel-heading">Treus-8</h1>
+				<hr/>
+				<div class="panel-grid">
+					<p class="panel-label">X Position</p><p class="panel-value">1000</p>
+					<p class="panel-label">Y Position</p><p class="panel-value">2000</p>
+					<p class="panel-label">Z Position</p><p class="panel-value">3000</p>
+				</div>
+				<hr/>
+				<div class="panel-grid">
+					<p class="panel-label">Star Type</p><p class="panel-value">StarO</p>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

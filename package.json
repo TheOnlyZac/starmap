@@ -25,8 +25,12 @@
   "author": "TheOnlyZac",
   "license": "GPL-3.0",
   "pkg": {
-    "scripts": [ "*.js" ],
-    "assets": [ "public/**/*" ],
+    "scripts": [
+      "*.js"
+    ],
+    "assets": [
+      "public/**/*"
+    ],
     "outputPath": "build"
   }
 }

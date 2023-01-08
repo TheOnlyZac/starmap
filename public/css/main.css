@@ -26,6 +26,8 @@ h1, h2, h3, h4, h5, h6 {
     margin: 4px 0px 4px 0px;
 }
 
+/* GUI */
+
 #tooltip {
     position: absolute;
 
@@ -36,13 +38,64 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     white-space: nowrap;
 
-    background-color: rgba(0, 0, 0, 0.66);
+    background-color: rgba(7, 7, 10, 0.80);
+    backdrop-filter: blur(4px);
 
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 4px;
 
     user-select: none;
-    cursor: pointer;
     overflow: hidden;
     z-index: 1;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 133px;
+    padding: 10px 15px 10px 15px;
+
+    color: rgb(220, 220, 220);
+    font-family: 'Calibri', sans-serif;
+
+    background-color: rgba(7, 7, 10, 0.80);
+    backdrop-filter: blur(4px);
+
+    
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 2px;
+
+    /*border: 1px solid rgba(255, 255, 255, 0.5);*/
+    box-shadow: 0px 0px 2px rgba(255, 255, 255, 0.1);
+
+    user-select: none;
+}
+
+.panel * {
+    margin: 0;
+    padding: 0;
+}
+
+.panel-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-items: center;
+
+    width: 100%;
+    height: 100%;
+    
+}
+
+.panel-grid h1, .panel-grid h2, .panel-grid h3 {
+    color: red;
+}
+
+.panel hr {
+    margin: 5px 0px 5px 0px;
+    width: 100%;
+
+    border: 1px solid rgba(20, 20, 20, 0.8);
 }
