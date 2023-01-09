@@ -1,10 +1,26 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 
-var DISABLE_LOADING_SCREEN = true;
+var DISABLE_LOADING_SCREEN = false;
 
 //todo make not global
 var pointedObject;
+
+var enumStarTypes = Object.freeze({
+	None: 0,
+	GalacticCore: 1,
+	BlackHole: 2,
+	ProtoPlanetary: 3,
+	StarG: 4, // Yellow star
+	StarO: 5, // Blue star
+	StarM: 6, // Red star
+	BinaryOO: 7, // Binary O-O (blue-blue) star system
+	BinaryOM: 8, // Binary O-M (blue-red) star system
+	BinaryOG: 9, // Binary O-G (blue-yellow) star system
+	BinaryGG: 10, // Binary G-G (yellow-yellow) star system
+	BinaryGM: 11, // Binary G-M (yellow-red) star system
+	BinaryMM: 12 // Binary M-M (red-red) star system
+});
 
 // Set up mouse input
 class MouseInput {
@@ -233,10 +249,55 @@ class GuiManager {
         if (pointedObject != null) {
             let starRecord = pointedObject.object.userData;
             document.querySelector('.value-name').innerHTML = starRecord.name;
+
+            let subtitleElement = document.querySelector('.panel-subtitle');
+            let subtitle;
+            switch (starRecord.type) {
+                case enumStarTypes.GalacticCore:
+                    subtitle = "Supermassive black hole";
+                    break;
+                case enumStarTypes.BlackHole:
+                    subtitle = "Black hole";
+                    break;
+                case enumStarTypes.ProtoPlanetary:
+                    subtitle = "Proto-planetary disk";
+                    break;
+                case enumStarTypes.StarG:
+                    subtitle = 'Yellow star system';
+                    break;
+                case enumStarTypes.StarO:
+                    subtitle = 'Blue star system';
+                    break;
+                case enumStarTypes.StarM:
+                    subtitle = 'Red star system';
+                    break;
+                case enumStarTypes.BinaryOO:
+                    subtitle = 'Blue-blue binary system';
+                    break;
+                case enumStarTypes.BinaryOM:
+                    subtitle = 'Blue-red binary system';
+                    break;
+                case enumStarTypes.BinaryOG:
+                    subtitle = 'Blue-yellow binary system';
+                    break;
+                case enumStarTypes.BinaryGG:
+                    subtitle = 'Yellow-yellow binary system';
+                    break;
+                case enumStarTypes.BinaryGM:
+                    subtitle = 'Yellow-red binary system';
+                    break;
+                case enumStarTypes.BinaryMM:
+                    subtitle = 'Red-red binary system';
+                    break;
+                default:
+                    console.error("Unrecognized star type", starRecord.type);
+                    subtitle = "Unknown star type";
+            }
+            subtitleElement.innerHTML = subtitle;
+
             document.querySelector('.value-posx').innerHTML = starRecord.position.x.toFixed(3);
             document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
             document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
-            document.querySelector('.value-type').innerHTML = starRecord.type;
             this.propsPanel.style.visibility = 'visible';
         } else {
             this.propsPanel.style.visibility = 'hidden';
