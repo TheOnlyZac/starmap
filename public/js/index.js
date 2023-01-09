@@ -32,6 +32,7 @@ class MouseInput {
         this.mouseUpPos = new THREE.Vector2(0, 0);
         this.mouseDownTime = 0;
         this.mouseUpTime = 0;
+        this.lastMouseUpTime = 0;
         this.clickDurMs = 0;
 
         this.bindEventListeners();
@@ -53,6 +54,7 @@ class MouseInput {
     // Mouse up event listener
     onMouseUp(event) {
         if (!this.fEnabled) return;
+        this.lastMouseUpTime = this.mouseUpTime;
         this.mouseUpTime = new Date().getTime();
         this.mouseUpPos.set(event.x, event.y);
         this.clickDurMs = this.mouseUpTime - this.mouseDownTime;
@@ -75,6 +77,12 @@ class MouseInput {
         let dx = this.mouseUpPos.x - this.mouseDownPos.x;
         let dy = this.mouseUpPos.y - this.mouseDownPos.y;
         return (dx == 0 && dy == 0) ? true : false;
+    }
+
+    // Checks if the last mouse click was the second click of a double-click
+    wasDoubleClick() {
+        let dtClicks = this.mouseUpTime - this.lastMouseUpTime;
+        return dtClicks < 250 ? true : false;
     }
 }
 const mouseInput = new MouseInput();
@@ -145,6 +153,12 @@ class SceneManager {
         console.log('Done.');
     }
 
+    // Smoothly move the camera to the given position
+    glideCameraToward(position) {
+        this.fCameraGliding = true;
+        this.cameraTargetPos = position;
+    }
+
     // Update scene objects
     update() {
         // Update camera controls
@@ -160,6 +174,9 @@ class SceneManager {
 
             // Lerp camera position towards target
             this.camera.position.lerp(this.cameraTargetPos, 0.05);
+
+            // Keep making controls target the target pos until done gliding
+            //this.controls.target.set(this.cameraTargetPos.x, this.cameraTargetPos.y*2, this.cameraTargetPos.z);
 
             if (this.camera.position.distanceTo(this.cameraTargetPos) < 1) {
                 // Done gliding, re-enable camera controls
@@ -299,6 +316,19 @@ class GuiManager {
             document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
             document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
             this.propsPanel.style.visibility = 'visible';
+
+            /* todo: double click star to focus on it 
+            if (mouseInput.wasDoubleClick() && !sceneManager.fCameraGliding) {
+                // need to convert starrecord position to a three vec3 so the math is mathing
+                let starPos = new THREE.Vector3(starRecord.position.x, starRecord.position.y * 2, starRecord.position.z)
+                let offset = new THREE.Vector3(0, 10, 0);
+                let target = starPos.add(offset);
+
+                console.log(starRecord.position, target);
+
+                //sceneManager.controls.target.set(starPos.x, starPos.y*2, starPos.z);
+                sceneManager.glideCameraToward(target)
+            } */
         } else {
             this.propsPanel.style.visibility = 'hidden';
         }
@@ -485,10 +515,8 @@ function rgbToHex(r, g, b) {
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
         case ' ':
-            console.log('space');
             sceneManager.controls.target.set(0, 0, 0);
-            sceneManager.cameraTargetPos = new THREE.Vector3(10, 50, 10);
-            sceneManager.fCameraGliding = true;
+            sceneManager.glideCameraToward(new THREE.Vector3(10, 50, 10));
             break;
         default:
             break;

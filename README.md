@@ -18,6 +18,7 @@ Control the camera using the mouse.
 * **Scroll Wheel** to zoom in/out
 * **Space** to reset the camera
 * **Hover the mouse** over a star to view its name
+* **Click on a star** to view its details
 
 ## Notes
 
@@ -26,4 +27,6 @@ Control the camera using the mouse.
 
 ## Attribution
 
-Skybox textures courtesy of Screaming Brain Studios on OpenGameArt ([source](https://opengameart.org/content/seamless-space-backgrounds))
+Skybox textures by Screaming Brain Studios on OpenGameArt ([source](https://opengameart.org/content/seamless-space-backgrounds))
+
+Fullscreen icon created by kendis lasman on Flaticon ([source](https://www.flaticon.com/free-icons/fullscreen))
