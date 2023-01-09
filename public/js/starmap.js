@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 
+import StarMapAPI from './api.js';
+const api = new StarMapAPI();
+
 var DISABLE_LOADING_SCREEN = false;
 
 //todo make not global
@@ -153,6 +156,20 @@ class SceneManager {
         console.log('Done.');
     }
 
+    // Clears all meshes from the scene
+    clearMeshes() {
+        console.log('Clearing all meshes from scene...');
+        for (let i = this.scene.children.length - 1; i >= 0; i--) {
+            let child = this.scene.children[i];
+            if(child.type === "Mesh") {
+                child.geometry.dispose();
+                child.material.dispose();
+                this.scene.remove(child);
+            }
+        }
+        console.log('Done.');
+    }
+
     // Smoothly move the camera to the given position
     glideCameraToward(position) {
         this.fCameraGliding = true;
@@ -225,6 +242,7 @@ class GuiManager {
     constructor() {
         this.fLoading = false;
         this.tLastSpinnerUpdate = 0; // time spinner was last updated
+        this.tLoadingStarted = 0; // time the last load was initiated
 
         this.tooltip = document.querySelector('#tooltip');
         
@@ -335,26 +353,36 @@ class GuiManager {
     };
 
     showLoadingOverlay() {
+        this.tLoadingStarted = new Date().getTime();
+
         let loadingOverlay = document.querySelector('#loading-overlay');
         let spinner = document.querySelector('#spinner');
         
         spinner.innerHTML = 'Loading';
-        loadingOverlay.style.display = 'block';
+        loadingOverlay.style.display = 'flex';
         loadingOverlay.style.opacity = 1.0;
         this.fLoading = true;
     }
 
     hideLoadingOverlay() {
-        this.fLoading = false;
-        document.querySelector('#spinner').innerHTML = 'Ready!';
-        
-        let loadingOverlay = document.querySelector('#loading-overlay');
+        const now = new Date().getTime();
+        const loadingDurMs = now - this.tLoadingStarted;
+
+        // Always load for at least one second so the transition isn't jarring
+        let dummyLoadTimeoutMs = loadingDurMs > 1000 ? 0 : 1000 - loadingDurMs;
+
         setTimeout(() => {
-            loadingOverlay.style.opacity = 0.0;
-        }, 250);
-        setTimeout(() => {
-            loadingOverlay.style.display = 'none';
-        }, 1250);
+            this.fLoading = false;
+            document.querySelector('#spinner').innerHTML = 'Ready!';
+            
+            let loadingOverlay = document.querySelector('#loading-overlay');
+            setTimeout(() => {
+                loadingOverlay.style.opacity = 0.0;
+            }, 250);
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 1250);
+        }, dummyLoadTimeoutMs);
     }
 
     update() {
@@ -480,6 +508,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     // Upload file when selected
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
+
         console.log("Uploading file " + file.name);
 
         uploadStarRecordsFile(file);
@@ -488,21 +517,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 // Upload star records file to be processed by the server
 function uploadStarRecordsFile(file) {
+    guiManager.showLoadingOverlay();
+
     const formData = new FormData();
     formData.append('file', file);
-
-    fetch('/process-star-data', {
-        method: 'POST',
-        body: formData
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            // Handle the response data as needed
-            generateStarMeshes(data.data);
+    api.post('upload-star-records', formData)
+        .then((response) => {
+            starManager.starRecords = response.data;
+            sceneManager.clearMeshes();
+            starManager.generateMeshes();
+            sceneManager.addMeshes(starManager.meshes);
         })
-        .catch((error) => {
-            console.error(error);
+        .catch((e) => {
+            console.error(e);
         });
+    
+        guiManager.hideLoadingOverlay();
 }
 
 // Convert rgb values to hex
@@ -524,37 +554,28 @@ document.addEventListener('keydown', (event) => {
 });
 
 // Request sample star records and set up meshes in scene manager
-guiManager.fLoading = true;
+guiManager.showLoadingOverlay();
 
-const req = new XMLHttpRequest();
-req.open('POST', 'example-star-records');
-req.onload = function() {
-    const response = JSON.parse(this.responseText);
-    
-    if (response.status == '200') {
-        const starRecords = response.data;
+const res = await api.get('example-star-records');
+const exampleStarRecords = res.data;
+starManager.starRecords = exampleStarRecords;
 
-        starManager.starRecords = starRecords;
-        starManager.generateMeshes();
+sceneManager.clearMeshes();
+starManager.generateMeshes();
+sceneManager.addMeshes(starManager.meshes);
 
-        sceneManager.addMeshes(starManager.meshes);
+guiManager.hideLoadingOverlay();
 
-        guiManager.hideLoadingOverlay();
-    } else {
-        console.error(new Error("Server responded with error code " + response.status));
-        guiManager.hideLoadingOverlay();
-    }
-};
-req.send();
-
-// Render the scene
+// Start render loop
 function render() {
-    // Update camera controls
+    // Update the scene
     sceneManager.update();
     sceneManager.raycast();
 
+    // Update the gui
     guiManager.update();
 
+    // Render frame
     requestAnimationFrame(render);
     sceneManager.render();
 }

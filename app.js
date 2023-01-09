@@ -33,7 +33,7 @@ function deserializeStarRecords(data) {
 }
 
 // Set up routes to handle JSON data and serve static assets
-app.post('/process-star-data', upload.single('file'), (req, res) => {
+app.post('/upload-star-records', upload.single('file'), (req, res) => {
     // Access the file data in the request body
     const file = req.file;
 
@@ -41,13 +41,13 @@ app.post('/process-star-data', upload.single('file'), (req, res) => {
     const buffer = file.buffer;
 
     // Deserialize star records
-    starRecords = deserializeStarRecords(buffer);
+    const starRecords = deserializeStarRecords(buffer);
 
     // Send a response to the client
     res.send({ status: 'success', data: starRecords });
 });
 
-app.post('/example-star-records', (req, res) => {
+app.get('/example-star-records', (req, res) => {
     // Open example star record file
     let fname = path.join(__dirname, 'backend/bin/stars.bin');
     fs.readFile(fname, (err, fd) => {
