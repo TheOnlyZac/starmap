@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const file = event.target.files[0];
         console.log("Uploading file " + file.name);
 
-        uploadStarRecordsFile(file)
+        uploadStarRecordsFile(file);
     });
 });
 
@@ -125,7 +125,7 @@ scene.background = new THREE.Color(0x000000);
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.far = 3500
-camera.position.set(50, 100, 50);
+camera.position.set(10, 50, 10);
 camera.updateProjectionMatrix();
 
 // Resize renderer on window resize
@@ -145,6 +145,19 @@ var tooltip = document.querySelector('#tooltip');
 
 const pointer = new THREE.Vector2();
 document.addEventListener('mousemove', onPointerMove);
+
+// Track star pointed at by mouse cursor and show props panel on click
+let pointedObject;
+window.addEventListener('click', (event) => {
+    if (pointedObject != null) {
+        let starRecord = pointedObject.object.userData;
+        document.querySelector('.value-name').innerHTML = starRecord.name;
+        document.querySelector('.value-posx').innerHTML = starRecord.position.x.toFixed(3);
+        document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
+        document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
+        document.querySelector('.value-type').innerHTML = starRecord.type;
+    }
+});
 
 // Setup skybox
 var texName = 'img/starfield.png'
@@ -183,7 +196,8 @@ function render() {
 
     // Check if raycast hit a star
     if (intersects.length > 0) {
-        let starName = intersects[0].object.userData.name;
+        pointedObject = intersects[0]
+        let starName = pointedObject.object.userData.name;
 
         // Show tooltip with star name on mouseover
         tooltip.style.visibility = 'visible';
@@ -192,10 +206,9 @@ function render() {
         tooltip.innerHTML = starName;
 
         document.body.style.cursor = 'help';
-    
-        // Show properties panel on click
 
     } else {
+        pointedObject = null;
         tooltip.style.visibility = 'hidden';
         document.body.style.cursor = 'auto';
     }
