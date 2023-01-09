@@ -4,6 +4,7 @@ import { OrbitControls } from 'OrbitControls';
 // Set up mouse input
 class MouseInput {
     constructor() {
+        this.fEnabled = true;
         this.cursor = new THREE.Vector2(0, 0);
 
         this.mouseDownPos = new THREE.Vector2(0, 0);
@@ -23,12 +24,14 @@ class MouseInput {
 
     // Mouse down event listener
     onMouseDown(event) {
+        if (!this.fEnabled) return;
         this.mouseDownTime = new Date().getTime();
         this.mouseDownPos.set(event.x, event.y);
     };
     
     // Mouse up event listener
     onMouseUp(event) {
+        if (!this.fEnabled) return;
         this.mouseUpTime = new Date().getTime();
         this.mouseUpPos.set(event.x, event.y);
         this.clickDurMs = this.mouseUpTime - this.mouseDownTime;
@@ -36,6 +39,7 @@ class MouseInput {
 
     // Pointer move event listener
     onPointerMove(event) {
+        if (!this.fEnabled) return;
         this.cursor.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.cursor.y = - (event.clientY / window.innerHeight) * 2 + 1;
     }
@@ -181,6 +185,9 @@ var controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.screenSpacePanning = false;
 
+var cameraTargetPos; // set when camera needs to glide to a position
+var fCameraGliding;
+
 // Resize renderer on window resize
 window.addEventListener('resize', (event) => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -251,6 +258,19 @@ req.onload = function () {
 req.open('POST', 'example-star-records');
 req.send();
 
+// Setup key input
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case ' ':
+            controls.target.set(0, 0, 0);
+            cameraTargetPos = new THREE.Vector3(10, 50, 10);
+            fCameraGliding = true;
+            break;
+        default:
+            break;
+    }
+});
+
 // Render the scene
 function render() {
     // Update camera controls
@@ -278,6 +298,21 @@ function render() {
             pointedObject = null;
             tooltip.style.visibility = 'hidden';
             document.body.style.cursor = 'auto';
+        }
+    }
+
+    // Update camera positoin if gliding to target
+    if (fCameraGliding) {
+        // Disable camera controls while gliding
+        controls.enabled = false;
+
+        // Lerp camera position towards target
+        camera.position.lerp(cameraTargetPos, 0.05);
+        camera.updateMatrix();
+
+        if (camera.position.distanceTo(cameraTargetPos) < 1) {
+            fCameraGliding = false;
+            controls.enabled = true;
         }
     }
 

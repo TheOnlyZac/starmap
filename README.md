@@ -16,6 +16,7 @@ Control the camera using the mouse.
 * **Left Click + Drag** to rotate
 * **Right Click + Drag** to pan
 * **Scroll Wheel** to zoom in/out
+* **Space** to reset the camera
 * **Hover the mouse** over a star to view its name
 
 ## Notes
