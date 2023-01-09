@@ -531,7 +531,7 @@ req.open('POST', 'example-star-records');
 req.onload = function() {
     const response = JSON.parse(this.responseText);
     
-    if (response.status == 'success') {
+    if (response.status == '200') {
         const starRecords = response.data;
 
         starManager.starRecords = starRecords;
@@ -541,7 +541,8 @@ req.onload = function() {
 
         guiManager.hideLoadingOverlay();
     } else {
-        window.alert('When requesting a copy of the sample star data, the server responded with the following status: ', response.status);
+        console.error(new Error("Server responded with error code " + response.status));
+        guiManager.hideLoadingOverlay();
     }
 };
 req.send();
