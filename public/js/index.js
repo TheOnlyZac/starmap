@@ -1,6 +1,60 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 
+// Set up mouse input
+class MouseInput {
+    constructor() {
+        this.cursor = new THREE.Vector2(0, 0);
+
+        this.mouseDownPos = new THREE.Vector2(0, 0);
+        this.mouseUpPos = new THREE.Vector2(0, 0);
+        this.mouseDownTime = 0;
+        this.mouseUpTime = 0;
+        this.clickDurMs = 0;
+
+        this.bindEventListeners();
+    }
+
+    bindEventListeners() {
+        document.addEventListener('mousedown', this.onMouseDown.bind(this));
+        document.addEventListener('mouseup', this.onMouseUp.bind(this));
+        document.addEventListener('mousemove', this.onPointerMove.bind(this));
+    }
+
+    // Mouse down event listener
+    onMouseDown(event) {
+        this.mouseDownTime = new Date().getTime();
+        this.mouseDownPos.set(event.x, event.y);
+    };
+    
+    // Mouse up event listener
+    onMouseUp(event) {
+        this.mouseUpTime = new Date().getTime();
+        this.mouseUpPos.set(event.x, event.y);
+        this.clickDurMs = this.mouseUpTime - this.mouseDownTime;
+    }
+
+    // Pointer move event listener
+    onPointerMove(event) {
+        this.cursor.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.cursor.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    // Checks if click was longer than the threshold for a long click
+    wasLongClick() {
+        return this.clickDurMs > 250 ? true : false;
+    }
+
+    // Checks if the mouse moved during the last time it was clicked
+    wasStationaryClick() {
+        let dx = this.mouseUpPos.x - this.mouseDownPos.x;
+        let dy = this.mouseUpPos.y - this.mouseDownPos.y;
+        return (dx == 0 && dy == 0) ? true : false;
+    }
+}
+
+const mouseInput = new MouseInput();
+
 // Handle uploading file to server when selected
 document.addEventListener("DOMContentLoaded", function (event) {
     const fileInput = document.querySelector('#file-input');
@@ -31,7 +85,6 @@ function uploadStarRecordsFile(file) {
         .then((response) => response.json())
         .then((data) => {
             // Handle the response data as needed
-            console.log(data);
             drawStarPoints(data.data);
         })
         .catch((error) => {
@@ -47,7 +100,7 @@ function rgbToHex(r, g, b) {
 
 // Draw mesh for each star in the star records
 function drawStarPoints(starRecords = []) {
-    console.log("Drawing star points");
+    console.log("Drawing star points...");
 
     // Set up star points geometry
     let stars = [];
@@ -107,12 +160,8 @@ function drawStarPoints(starRecords = []) {
         mesh.userData = star;
         scene.add(mesh);
     });
-}
 
-// Pointer move event listener
-function onPointerMove(event) {
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    console.log("Done.");
 }
 
 // Set up a basic scene
@@ -128,6 +177,10 @@ camera.far = 3500
 camera.position.set(10, 50, 10);
 camera.updateProjectionMatrix();
 
+var controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.screenSpacePanning = false;
+
 // Resize renderer on window resize
 window.addEventListener('resize', (event) => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -136,19 +189,29 @@ window.addEventListener('resize', (event) => {
     renderer.setSize( window.innerWidth, window.innerHeight );
 });
 
-var controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.screenSpacePanning = false;
-
+// Set up raycasting
 var raycaster = new THREE.Raycaster();
-var tooltip = document.querySelector('#tooltip');
+var fEnableRaycasting = true;
 
-const pointer = new THREE.Vector2();
-document.addEventListener('mousemove', onPointerMove);
+var tooltip = document.querySelector('#tooltip');
+var propsPanel = document.querySelector('#properties-panel');
+propsPanel.style.visibility = 'hidden';
+
+// Disable raycasting while mouse is on ui panels
+document.querySelector('.panel').addEventListener('mouseover', (event) => {
+    fEnableRaycasting = false;
+});
+
+document.querySelector('.panel').addEventListener('mouseleave', (event) => {
+    fEnableRaycasting = true;
+});
 
 // Track star pointed at by mouse cursor and show props panel on click
-let pointedObject;
+var pointedObject;
 window.addEventListener('click', (event) => {
+    if (mouseInput.wasLongClick() | !mouseInput.wasStationaryClick())
+        return; // abort if long click or mouse moved during click
+
     if (pointedObject != null) {
         let starRecord = pointedObject.object.userData;
         document.querySelector('.value-name').innerHTML = starRecord.name;
@@ -156,6 +219,9 @@ window.addEventListener('click', (event) => {
         document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
         document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
         document.querySelector('.value-type').innerHTML = starRecord.type;
+        propsPanel.style.visibility = 'visible';
+    } else {
+        propsPanel.style.visibility = 'hidden';
     }
 });
 
@@ -177,7 +243,7 @@ scene.background = textureCube;
 var req = new XMLHttpRequest();
 req.onload = function () {
     const response = JSON.parse(this.response);
-    console.log(response);
+    
     if (response.status == 'success') {
         drawStarPoints(response.data);
     }
@@ -190,27 +256,29 @@ function render() {
     // Update camera controls
     controls.update();
 
-    // Cast ray from camera
-    raycaster.setFromCamera(pointer, camera);
-    const intersects = raycaster.intersectObjects(scene.children, false);
-
-    // Check if raycast hit a star
-    if (intersects.length > 0) {
-        pointedObject = intersects[0]
-        let starName = pointedObject.object.userData.name;
-
-        // Show tooltip with star name on mouseover
-        tooltip.style.visibility = 'visible';
-        tooltip.style.left = (pointer.x + 1) / 2 * window.innerWidth + 5 + 'px';
-        tooltip.style.top = (-pointer.y + 1) / 2 * window.innerHeight - 30 + 'px';
-        tooltip.innerHTML = starName;
-
-        document.body.style.cursor = 'help';
-
-    } else {
-        pointedObject = null;
-        tooltip.style.visibility = 'hidden';
-        document.body.style.cursor = 'auto';
+    // Cast ray from camera to pointer to detect stars
+    if (fEnableRaycasting) {
+        raycaster.setFromCamera(mouseInput.cursor, camera);
+        const intersects = raycaster.intersectObjects(scene.children, false);
+    
+        // Check if raycast hit a star
+        if (intersects.length > 0) {
+            pointedObject = intersects[0]
+            let starName = pointedObject.object.userData.name;
+    
+            // Show tooltip with star name on mouseover
+            tooltip.style.visibility = 'visible';
+            tooltip.style.left = (mouseInput.cursor.x + 1) / 2 * window.innerWidth + 5 + 'px';
+            tooltip.style.top = (-mouseInput.cursor.y + 1) / 2 * window.innerHeight - 30 + 'px';
+            tooltip.innerHTML = starName;
+    
+            document.body.style.cursor = 'help';
+    
+        } else {
+            pointedObject = null;
+            tooltip.style.visibility = 'hidden';
+            document.body.style.cursor = 'auto';
+        }
     }
 
     requestAnimationFrame(render);
