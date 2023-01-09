@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 
+var DISABLE_LOADING_SCREEN = true;
+
 //todo make not global
 var pointedObject;
 
@@ -112,10 +114,10 @@ class SceneManager {
     }
 
     onResize(event) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
     
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        this.renderer.setSize( window.innerWidth, window.innerHeight );
     }
 
     // Add the given meshes to the scene
@@ -206,6 +208,15 @@ class GuiManager {
             sceneManager.fEnableRaycasting = true;
         });
 
+        document.querySelector('#fullscreen-btn').addEventListener('click', (event) => {
+            //todo: support moz and webkit fullscreen requests
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        });
+
         this.bindEventListeners();
     }
 
@@ -213,11 +224,12 @@ class GuiManager {
         window.addEventListener('click', this.onClick.bind(this));
     }
     
-    // Track star pointed at by mouse cursor and show props panel on click
+    // Mouse click event handler
     onClick(event) {
         if (mouseInput.wasLongClick() | !mouseInput.wasStationaryClick())
             return; // abort if long click or mouse moved during click
 
+        // Show props panel for star pointed at by mouse cursor
         if (pointedObject != null) {
             let starRecord = pointedObject.object.userData;
             document.querySelector('.value-name').innerHTML = starRecord.name;
@@ -230,6 +242,16 @@ class GuiManager {
             this.propsPanel.style.visibility = 'hidden';
         }
     };
+
+    showLoadingOverlay() {
+        let loadingOverlay = document.querySelector('#loading-overlay');
+        let spinner = document.querySelector('#spinner');
+        
+        spinner.innerHTML = 'Loading';
+        loadingOverlay.style.display = 'block';
+        loadingOverlay.style.opacity = 1.0;
+        this.fLoading = true;
+    }
 
     hideLoadingOverlay() {
         this.fLoading = false;
@@ -245,6 +267,12 @@ class GuiManager {
     }
 
     update() {
+        // Debug flag to disable the loading screen
+        if (DISABLE_LOADING_SCREEN) {
+            this.fLoading = false;
+            document.querySelector('#loading-overlay').style.display = 'none';
+        }
+
         // Update spinner text if loading
         if (!this.fLoading) return; // abort if not loading
         
