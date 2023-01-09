@@ -188,6 +188,9 @@ const sceneManager = new SceneManager();
 
 class GuiManager {
     constructor() {
+        this.fLoading = false;
+        this.tLastSpinnerUpdate = 0; // time spinner was last updated
+
         this.tooltip = document.querySelector('#tooltip');
         
         this.propsPanel = document.querySelector('#properties-panel');
@@ -227,6 +230,46 @@ class GuiManager {
             this.propsPanel.style.visibility = 'hidden';
         }
     };
+
+    hideLoadingOverlay() {
+        this.fLoading = false;
+        document.querySelector('#spinner').innerHTML = 'Ready!';
+        
+        let loadingOverlay = document.querySelector('#loading-overlay');
+        setTimeout(() => {
+            loadingOverlay.style.opacity = 0.0;
+        }, 250);
+        setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+        }, 1250);
+    }
+
+    update() {
+        // Update spinner text if loading
+        if (!this.fLoading) return; // abort if not loading
+        
+        let now = new Date().getTime();
+        let dtSpinnerUpdate = now - this.tLastSpinnerUpdate;
+        
+        if (dtSpinnerUpdate > 500) {
+            this.tLastSpinnerUpdate = now;
+            let spinner = document.querySelector('#spinner');
+            switch (spinner.innerHTML) {
+                case 'Loading':
+                    spinner.innerHTML = 'Loading.';
+                    break;
+                case 'Loading.':
+                    spinner.innerHTML = 'Loading..';
+                    break;
+                case 'Loading..':
+                    spinner.innerHTML = 'Loading...';
+                    break;
+                default:
+                    spinner.innerHTML = 'Loading.'
+                    break;
+            }
+        }
+    }
 }
 const guiManager = new GuiManager();
 
@@ -364,6 +407,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 // Request sample star records and set up meshes in scene manager
+guiManager.fLoading = true;
+
 const req = new XMLHttpRequest();
 req.open('POST', 'example-star-records');
 req.onload = function() {
@@ -376,6 +421,8 @@ req.onload = function() {
         starManager.generateMeshes();
 
         sceneManager.addMeshes(starManager.meshes);
+
+        guiManager.hideLoadingOverlay();
     } else {
         window.alert('When requesting a copy of the sample star data, the server responded with the following status: ', response.status);
     }
@@ -387,6 +434,8 @@ function render() {
     // Update camera controls
     sceneManager.update();
     sceneManager.raycast();
+
+    guiManager.update();
 
     requestAnimationFrame(render);
     sceneManager.render();
