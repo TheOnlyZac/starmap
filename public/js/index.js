@@ -56,8 +56,121 @@ class MouseInput {
         return (dx == 0 && dy == 0) ? true : false;
     }
 }
-
 const mouseInput = new MouseInput();
+
+class SceneManager {
+    constructor() {
+        // Setup renderer
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(this.renderer.domElement);
+
+        // Setup scene
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x000000);
+        
+        // Setup skybox
+        var texName = 'img/starfield.png'
+        var skyTextures = [
+            texName,
+            texName,
+            texName,
+            texName,
+            texName,
+            texName,
+        ];
+        
+        var textureCube = new THREE.CubeTextureLoader().load(skyTextures);
+        this.scene.background = textureCube;
+
+        // Setup camera + orbitcontrols
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.far = 3500
+        this.camera.position.set(10, 50, 10);
+        this.camera.updateProjectionMatrix();
+
+        this.cameraTargetPos = new THREE.Vector2(); // set when camera needs to glide to a position
+        this.fCameraGliding = false;
+
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.screenSpacePanning = false;
+
+        // Set up raycasting
+        this.raycaster = new THREE.Raycaster();
+        this.fEnableRaycasting = true;
+    
+        // Bind event listeners
+        this.bindEventListeners();
+    }
+
+    bindEventListeners() {
+        window.addEventListener('resize', this.onResize.bind(this));
+    }
+
+    onResize(event) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    
+        renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    // Update scene objects
+    update() {
+        // Update camera controls
+        this.controls.update();
+
+        // Update camera matrix
+        this.camera.updateMatrix();
+
+        // Update camera position if gliding to target
+        if (this.fCameraGliding) {
+            // Disable camera controls while gliding
+            this.controls.enabled = false;
+
+            // Lerp camera position towards target
+            this.camera.position.lerp(this.cameraTargetPos, 0.05);
+
+            if (this.camera.position.distanceTo(this.cameraTargetPos) < 1) {
+                this.fCameraGliding = false;
+                this.controls.enabled = true;
+            }
+        }
+    }
+
+    raycast() {
+        // Cast ray from camera to pointer to detect stars
+        if (!this.fEnableRaycasting) return;
+
+        this.raycaster.setFromCamera(mouseInput.cursor, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.scene.children, false);
+    
+        // Check if raycast hit a star
+        if (intersects.length > 0) {
+            pointedObject = intersects[0]
+            let starName = pointedObject.object.userData.name;
+    
+            // Show tooltip with star name on mouseover
+            tooltip.style.visibility = 'visible';
+            tooltip.style.left = (mouseInput.cursor.x + 1) / 2 * window.innerWidth + 5 + 'px';
+            tooltip.style.top = (-mouseInput.cursor.y + 1) / 2 * window.innerHeight - 30 + 'px';
+            tooltip.innerHTML = starName;
+    
+            document.body.style.cursor = 'help';
+    
+        } else {
+            pointedObject = null;
+            tooltip.style.visibility = 'hidden';
+            document.body.style.cursor = 'auto';
+        }
+    }
+
+    // Render single frame
+    render() {
+        this.renderer.render(this.scene, this.camera);
+    }
+}
+const sceneManager = new SceneManager();
 
 // Handle uploading file to server when selected
 document.addEventListener("DOMContentLoaded", function (event) {
@@ -162,43 +275,11 @@ function drawStarPoints(starRecords = []) {
         const mesh = new THREE.Mesh(starGeometry, material);
         mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
         mesh.userData = star;
-        scene.add(mesh);
+        sceneManager.scene.add(mesh);
     });
 
     console.log("Done.");
 }
-
-// Set up a basic scene
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-var scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
-
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.far = 3500
-camera.position.set(10, 50, 10);
-camera.updateProjectionMatrix();
-
-var controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.screenSpacePanning = false;
-
-var cameraTargetPos; // set when camera needs to glide to a position
-var fCameraGliding;
-
-// Resize renderer on window resize
-window.addEventListener('resize', (event) => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize( window.innerWidth, window.innerHeight );
-});
-
-// Set up raycasting
-var raycaster = new THREE.Raycaster();
-var fEnableRaycasting = true;
 
 var tooltip = document.querySelector('#tooltip');
 var propsPanel = document.querySelector('#properties-panel');
@@ -206,11 +287,11 @@ propsPanel.style.visibility = 'hidden';
 
 // Disable raycasting while mouse is on ui panels
 document.querySelector('.panel').addEventListener('mouseover', (event) => {
-    fEnableRaycasting = false;
+    sceneManager.fEnableRaycasting = false;
 });
 
 document.querySelector('.panel').addEventListener('mouseleave', (event) => {
-    fEnableRaycasting = true;
+    sceneManager.fEnableRaycasting = true;
 });
 
 // Track star pointed at by mouse cursor and show props panel on click
@@ -232,20 +313,6 @@ window.addEventListener('click', (event) => {
     }
 });
 
-// Setup skybox
-var texName = 'img/starfield.png'
-var skyTextures = [
-    texName,
-    texName,
-    texName,
-    texName,
-    texName,
-    texName,
-];
-
-var textureCube = new THREE.CubeTextureLoader().load(skyTextures);
-scene.background = textureCube;
-
 // Request sample star data from server
 var req = new XMLHttpRequest();
 req.onload = function () {
@@ -262,9 +329,9 @@ req.send();
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
         case ' ':
-            controls.target.set(0, 0, 0);
-            cameraTargetPos = new THREE.Vector3(10, 50, 10);
-            fCameraGliding = true;
+            sceneManager.controls.target.set(0, 0, 0);
+            sceneManager.cameraTargetPos = new THREE.Vector3(10, 50, 10);
+            sceneManager.fCameraGliding = true;
             break;
         default:
             break;
@@ -274,49 +341,10 @@ document.addEventListener('keydown', (event) => {
 // Render the scene
 function render() {
     // Update camera controls
-    controls.update();
-
-    // Cast ray from camera to pointer to detect stars
-    if (fEnableRaycasting) {
-        raycaster.setFromCamera(mouseInput.cursor, camera);
-        const intersects = raycaster.intersectObjects(scene.children, false);
-    
-        // Check if raycast hit a star
-        if (intersects.length > 0) {
-            pointedObject = intersects[0]
-            let starName = pointedObject.object.userData.name;
-    
-            // Show tooltip with star name on mouseover
-            tooltip.style.visibility = 'visible';
-            tooltip.style.left = (mouseInput.cursor.x + 1) / 2 * window.innerWidth + 5 + 'px';
-            tooltip.style.top = (-mouseInput.cursor.y + 1) / 2 * window.innerHeight - 30 + 'px';
-            tooltip.innerHTML = starName;
-    
-            document.body.style.cursor = 'help';
-    
-        } else {
-            pointedObject = null;
-            tooltip.style.visibility = 'hidden';
-            document.body.style.cursor = 'auto';
-        }
-    }
-
-    // Update camera positoin if gliding to target
-    if (fCameraGliding) {
-        // Disable camera controls while gliding
-        controls.enabled = false;
-
-        // Lerp camera position towards target
-        camera.position.lerp(cameraTargetPos, 0.05);
-        camera.updateMatrix();
-
-        if (camera.position.distanceTo(cameraTargetPos) < 1) {
-            fCameraGliding = false;
-            controls.enabled = true;
-        }
-    }
+    sceneManager.update();
+    sceneManager.raycast();
 
     requestAnimationFrame(render);
-    renderer.render(scene, camera);
+    sceneManager.render();
 }
 render();
