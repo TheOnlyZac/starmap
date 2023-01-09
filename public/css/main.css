@@ -3,6 +3,8 @@ html, body {
     padding: 0;
 
     background-color: black;
+
+    overflow: hidden;
 }
 
 body {
@@ -18,12 +20,74 @@ canvas {
 
 #content {
     position: absolute;
+    width: 100%;
+    height: 100%;
+
     padding: 3px;
+    
     color: white;
+
+    pointer-events: none;
+}
+
+#content * {
+    pointer-events: all;
 }
 
 h1, h2, h3, h4, h5, h6 {
     margin: 4px 0px 4px 0px;
+}
+
+/* GUI */
+#loading-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    
+    color: white;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+
+    background-color: rgba(25, 40, 60, 0.9);
+    backdrop-filter: blur(5px);
+    
+    transition: opacity 1.0s;
+    z-index: 5;
+}
+
+#fullscreen-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 40px;
+    height: 40px;
+
+    color: white;
+    font-size: 28px;
+    line-height: 28px;
+    font-weight: bold;
+
+    border-radius: 100px;
+
+    user-select: none;
+    cursor: pointer;
+}
+
+#fullscreen-btn img {
+    width: 28px;
+    height: 28px;
+    pointer-events: none;
+    filter: invert(0.75);
 }
 
 #tooltip {
@@ -36,13 +100,64 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     white-space: nowrap;
 
-    background-color: rgba(0, 0, 0, 0.66);
+    background-color: rgba(7, 7, 10, 0.80);
+    backdrop-filter: blur(4px);
 
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 4px;
 
     user-select: none;
-    cursor: pointer;
     overflow: hidden;
     z-index: 1;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+
+    width: 210px;
+    padding: 14px 30px 14px 30px;
+
+    color: rgb(220, 220, 220);
+    font-family: 'Helvetica', 'Roboto', 'Calibri', 'Courier New', sans-serif;
+    
+    /*border: 2px solid rgba(255, 255, 255, 0.5);*/
+    border-radius: 2px;
+
+    box-shadow: 0px 0px 2px rgba(255, 255, 255, 0.1);
+
+    user-select: none;
+}
+
+.panel * {
+    margin: 0;
+    padding: 0;
+}
+
+.panel-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-items: left;
+
+    width: 100%;
+    height: 100%;
+    
+}
+
+.panel-grid h1, .panel-grid h2, .panel-grid h3 {
+    color: red;
+}
+
+.panel hr {
+    margin: 5px 0px 5px 0px;
+    width: 100%;
+
+    border: 1px solid rgba(130, 130, 130, 0.50);
+}
+
+.blurbg {
+    background-color: rgba(7, 7, 10, 0.57);
+    backdrop-filter: blur(5px);
 }
