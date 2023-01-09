@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 
+//todo make not global
+var pointedObject;
+
 // Set up mouse input
 class MouseInput {
     constructor() {
@@ -132,6 +135,7 @@ class SceneManager {
             this.camera.position.lerp(this.cameraTargetPos, 0.05);
 
             if (this.camera.position.distanceTo(this.cameraTargetPos) < 1) {
+                // Done gliding, re-enable camera controls
                 this.fCameraGliding = false;
                 this.controls.enabled = true;
             }
@@ -151,16 +155,17 @@ class SceneManager {
             let starName = pointedObject.object.userData.name;
     
             // Show tooltip with star name on mouseover
-            tooltip.style.visibility = 'visible';
-            tooltip.style.left = (mouseInput.cursor.x + 1) / 2 * window.innerWidth + 5 + 'px';
-            tooltip.style.top = (-mouseInput.cursor.y + 1) / 2 * window.innerHeight - 30 + 'px';
-            tooltip.innerHTML = starName;
+            //TODO decouple from GuiManager
+            guiManager.tooltip.style.visibility = 'visible';
+            guiManager.tooltip.style.left = (mouseInput.cursor.x + 1) / 2 * window.innerWidth + 5 + 'px';
+            guiManager.tooltip.style.top = (-mouseInput.cursor.y + 1) / 2 * window.innerHeight - 30 + 'px';
+            guiManager.tooltip.innerHTML = starName;
     
             document.body.style.cursor = 'help';
     
         } else {
             pointedObject = null;
-            tooltip.style.visibility = 'hidden';
+            guiManager.tooltip.style.visibility = 'hidden';
             document.body.style.cursor = 'auto';
         }
     }
@@ -171,6 +176,50 @@ class SceneManager {
     }
 }
 const sceneManager = new SceneManager();
+
+class GuiManager {
+    constructor() {
+        this.tooltip = document.querySelector('#tooltip');
+        
+        this.propsPanel = document.querySelector('#properties-panel');
+        this.propsPanel.style.visibility = 'hidden'; // start hidden
+
+        // Disable raycasting while mouse is on ui panels
+        //TODO decouple from sceneManager class
+        document.querySelector('.panel').addEventListener('mouseover', (event) => {
+            sceneManager.fEnableRaycasting = false;
+        });
+
+        document.querySelector('.panel').addEventListener('mouseleave', (event) => {
+            sceneManager.fEnableRaycasting = true;
+        });
+
+        this.bindEventListeners();
+    }
+
+    bindEventListeners() {
+        window.addEventListener('click', this.onClick.bind(this));
+    }
+    
+    // Track star pointed at by mouse cursor and show props panel on click
+    onClick(event) {
+        if (mouseInput.wasLongClick() | !mouseInput.wasStationaryClick())
+            return; // abort if long click or mouse moved during click
+
+        if (pointedObject != null) {
+            let starRecord = pointedObject.object.userData;
+            document.querySelector('.value-name').innerHTML = starRecord.name;
+            document.querySelector('.value-posx').innerHTML = starRecord.position.x.toFixed(3);
+            document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
+            document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
+            document.querySelector('.value-type').innerHTML = starRecord.type;
+            this.propsPanel.style.visibility = 'visible';
+        } else {
+            this.propsPanel.style.visibility = 'hidden';
+        }
+    };
+}
+const guiManager = new GuiManager();
 
 // Handle uploading file to server when selected
 document.addEventListener("DOMContentLoaded", function (event) {
@@ -202,7 +251,7 @@ function uploadStarRecordsFile(file) {
         .then((response) => response.json())
         .then((data) => {
             // Handle the response data as needed
-            drawStarPoints(data.data);
+            generateStarMeshes(data.data);
         })
         .catch((error) => {
             console.error(error);
@@ -216,7 +265,7 @@ function rgbToHex(r, g, b) {
 }
 
 // Draw mesh for each star in the star records
-function drawStarPoints(starRecords = []) {
+function generateStarMeshes(starRecords = []) {
     console.log("Drawing star points...");
 
     // Set up star points geometry
@@ -281,45 +330,13 @@ function drawStarPoints(starRecords = []) {
     console.log("Done.");
 }
 
-var tooltip = document.querySelector('#tooltip');
-var propsPanel = document.querySelector('#properties-panel');
-propsPanel.style.visibility = 'hidden';
-
-// Disable raycasting while mouse is on ui panels
-document.querySelector('.panel').addEventListener('mouseover', (event) => {
-    sceneManager.fEnableRaycasting = false;
-});
-
-document.querySelector('.panel').addEventListener('mouseleave', (event) => {
-    sceneManager.fEnableRaycasting = true;
-});
-
-// Track star pointed at by mouse cursor and show props panel on click
-var pointedObject;
-window.addEventListener('click', (event) => {
-    if (mouseInput.wasLongClick() | !mouseInput.wasStationaryClick())
-        return; // abort if long click or mouse moved during click
-
-    if (pointedObject != null) {
-        let starRecord = pointedObject.object.userData;
-        document.querySelector('.value-name').innerHTML = starRecord.name;
-        document.querySelector('.value-posx').innerHTML = starRecord.position.x.toFixed(3);
-        document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
-        document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
-        document.querySelector('.value-type').innerHTML = starRecord.type;
-        propsPanel.style.visibility = 'visible';
-    } else {
-        propsPanel.style.visibility = 'hidden';
-    }
-});
-
 // Request sample star data from server
 var req = new XMLHttpRequest();
 req.onload = function () {
     const response = JSON.parse(this.response);
     
     if (response.status == 'success') {
-        drawStarPoints(response.data);
+        generateStarMeshes(response.data);
     }
 };
 req.open('POST', 'example-star-records');
@@ -329,6 +346,7 @@ req.send();
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
         case ' ':
+            console.log('space');
             sceneManager.controls.target.set(0, 0, 0);
             sceneManager.cameraTargetPos = new THREE.Vector3(10, 50, 10);
             sceneManager.fCameraGliding = true;
