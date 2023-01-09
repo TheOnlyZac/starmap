@@ -118,6 +118,15 @@ class SceneManager {
         renderer.setSize( window.innerWidth, window.innerHeight );
     }
 
+    // Add the given meshes to the scene
+    addMeshes(meshes) {
+        console.log('Populating scene with meshes...');
+        meshes.forEach(mesh => {
+            sceneManager.scene.add(mesh);
+        });
+        console.log('Done.');
+    }
+
     // Update scene objects
     update() {
         // Update camera controls
@@ -221,6 +230,82 @@ class GuiManager {
 }
 const guiManager = new GuiManager();
 
+class StarManager {
+    constructor() {
+        this.starRecords = [];
+        this.meshes = [];
+    }
+    
+    // Generate a mesh for each star record
+    generateMeshes() {
+        console.log("Generating star meshes...");
+        this.meshes = [];
+    
+        // Set up star points geometry
+        let stars = [];
+        this.starRecords.forEach(record => {
+            let position = new THREE.Vector3(record.position.x, record.position.y, record.position.z);
+            stars.push({
+                name: record.name,
+                position: position,
+                type: record.type,
+                unk: record.unk10
+            });
+        });
+    
+        const whiteStarMaterial =   new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+        const redStarMaterial =     new THREE.MeshBasicMaterial({ color: 0xd36956 });
+        const yellowStarMaterial =  new THREE.MeshBasicMaterial({ color: 0xe5bd72 });
+        const blueStarMaterial =    new THREE.MeshBasicMaterial({ color: 0x64b3fc });
+        const binaryStarMaterial =  new THREE.MeshBasicMaterial({ color: 0xd1d1f6 });
+        const blackHoleMaterial =   new THREE.MeshBasicMaterial({ color: 0x0000FF });
+        const protoDiskMaterial =   new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+    
+        const starGeometry = new THREE.SphereGeometry(0.3, 6, 4);
+    
+        stars.forEach(star => {
+            let material = whiteStarMaterial;
+            switch (star.type) {
+                case 6: // red
+                case 12: // red-red
+                    material = redStarMaterial
+                    break;
+                case 4: // yellow
+                case 10: // yellow-yellow
+                    material = yellowStarMaterial;
+                    break;
+                case 5: // blue
+                case 7: // blue-blue
+                    material = blueStarMaterial;
+                    break;
+                case 2: // black hole
+                    material = blackHoleMaterial;
+                    break;
+                case 3: // proto-planetary disk
+                    material = protoDiskMaterial;
+                    break;
+                case 8:
+                case 9:
+                case 11:
+                    material = binaryStarMaterial;
+                    break;
+                default:
+                    break;
+            }
+    
+            //material = new THREE.MeshBasicMaterial({ color: star.color }); // temp
+            const mesh = new THREE.Mesh(starGeometry, material);
+            mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
+            mesh.userData = star;
+
+            this.meshes.push(mesh);
+        });
+    
+        console.log("Done.");
+    }
+}
+const starManager = new StarManager();
+
 // Handle uploading file to server when selected
 document.addEventListener("DOMContentLoaded", function (event) {
     const fileInput = document.querySelector('#file-input');
@@ -264,84 +349,6 @@ function rgbToHex(r, g, b) {
     return hex;
 }
 
-// Draw mesh for each star in the star records
-function generateStarMeshes(starRecords = []) {
-    console.log("Drawing star points...");
-
-    // Set up star points geometry
-    let stars = [];
-    starRecords.forEach(record => {
-        let position = new THREE.Vector3(record.position.x, record.position.y, record.position.z);
-        stars.push({
-            name: record.name,
-            position: position,
-            type: record.type,
-            unk: record.unk10
-        });
-    });
-
-    const whiteStarMaterial =   new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
-    const redStarMaterial =     new THREE.MeshBasicMaterial({ color: 0xd36956 });
-    const yellowStarMaterial =  new THREE.MeshBasicMaterial({ color: 0xe5bd72 });
-    const blueStarMaterial =    new THREE.MeshBasicMaterial({ color: 0x64b3fc });
-    const binaryStarMaterial =  new THREE.MeshBasicMaterial({ color: 0xd1d1f6 });
-    const blackHoleMaterial =   new THREE.MeshBasicMaterial({ color: 0x0000FF });
-    const protoDiskMaterial =   new THREE.MeshBasicMaterial({ color: 0xFF0000 });
-
-    const starGeometry = new THREE.SphereGeometry(0.3, 6, 4);
-
-    stars.forEach(star => {
-        let material = whiteStarMaterial;
-        switch (star.type) {
-            case 6: // red
-            case 12: // red-red
-                material = redStarMaterial
-                break;
-            case 4: // yellow
-            case 10: // yellow-yellow
-                material = yellowStarMaterial;
-                break;
-            case 5: // blue
-            case 7: // blue-blue
-                material = blueStarMaterial;
-                break;
-            case 2: // black hole
-                material = blackHoleMaterial;
-                break;
-            case 3: // proto-planetary disk
-                material = protoDiskMaterial;
-                break;
-            case 8:
-            case 9:
-            case 11:
-                material = binaryStarMaterial;
-                break;
-            default:
-                break;
-        }
-
-        //material = new THREE.MeshBasicMaterial({ color: star.color }); // temp
-        const mesh = new THREE.Mesh(starGeometry, material);
-        mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
-        mesh.userData = star;
-        sceneManager.scene.add(mesh);
-    });
-
-    console.log("Done.");
-}
-
-// Request sample star data from server
-var req = new XMLHttpRequest();
-req.onload = function () {
-    const response = JSON.parse(this.response);
-    
-    if (response.status == 'success') {
-        generateStarMeshes(response.data);
-    }
-};
-req.open('POST', 'example-star-records');
-req.send();
-
 // Setup key input
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
@@ -355,6 +362,25 @@ document.addEventListener('keydown', (event) => {
             break;
     }
 });
+
+// Request sample star records and set up meshes in scene manager
+const req = new XMLHttpRequest();
+req.open('POST', 'example-star-records');
+req.onload = function() {
+    const response = JSON.parse(this.responseText);
+    
+    if (response.status == 'success') {
+        const starRecords = response.data;
+
+        starManager.starRecords = starRecords;
+        starManager.generateMeshes();
+
+        sceneManager.addMeshes(starManager.meshes);
+    } else {
+        window.alert('When requesting a copy of the sample star data, the server responded with the following status: ', response.status);
+    }
+};
+req.send();
 
 // Render the scene
 function render() {
