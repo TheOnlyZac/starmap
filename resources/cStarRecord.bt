@@ -1,0 +1,124 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: stars.bin
+//   Authors: TheOnlyZac
+//   Version: 0.1
+//   Purpose: Spore galaxy stars db file
+//  Category: Data
+// 
+//  This template will NOT work on stars.db.
+//  
+//  It will only work on the cStarRecord file that
+//  is inside the stars.db package (hash 0x0179D304).
+//  
+//  You will need SporeModderFX or S3PE to extract yours.
+//------------------------------------------------
+
+typedef int Timestamp;
+typedef int TechLevel;
+typedef int StarID;
+typedef int ResourceKey;
+typedef int cSpeciesProfile;
+
+typedef int bool;
+typedef int uint32_t;
+
+enum StarFlags
+{
+	kStarFlagHasRare = 0x1000,  // 1 << 12
+};
+
+// The type of a star in a galaxy (which includes black holes, binary stars, 
+enum StarType
+{
+	None = 0,	/// The galactic core
+	GalacticCore = 1,	/// Black holes
+	BlackHole = 2,	/// Proto-planetary disks
+	ProtoPlanetary = 3,	/// Yellow stars
+	StarG = 4,	/// Blue stars
+	StarO = 5,	/// Red stars
+	StarM = 6,	/// Binary O-O (blue-blue) star system
+	BinaryOO = 7,	/// Binary O-M (blue-red) star system
+	BinaryOM = 8,	/// Binary O-G (blue-yellow) star system
+	BinaryOG = 9,	/// Binary G-G (yellow-yellow) star system
+	BinaryGG = 10,	/// Binary G-M (yellow-red) star system
+	BinaryGM = 11,	/// Binary M-M (red-red) star system
+	BinaryMM = 12
+};
+
+struct Vector3
+{
+    float xPosition, yPosition, zPosition;
+};
+
+struct PAIR {
+    int val1;
+    int val2 <format=hex>;
+};
+
+struct FILE {
+    struct STARRECORD {
+        // star key?
+        int mKey <name="Star Key", bgcolor=cWhite>;
+
+       // unk values
+        unsigned int unk1 <bgcolor=cBlack>;
+        unsigned int unk2 <bgcolor=cBlack>;
+        unsigned int unk3 <bgcolor=cBlack>;
+        unsigned int unk4 <bgcolor=cBlack>;
+
+        PAIR pairs[14] <bgcolor=cBlack>;
+        unsigned int pad_int <bgcolor=cRed>;
+
+        // star position
+        Vector3 mPosition <name="Position", fgcolor=cGreen>;
+        
+       // unknown values
+        byte unk <fgcolor=cRed, hidden=true>;
+        unsigned byte v_gradient <fgcolor=cLtRed>;
+        unsigned byte h_gradient <fgcolor=cLtRed>;
+        unsigned byte unk_cluster_distance <fgcolor=cLtRed>;
+
+        // star flags
+        unsigned int mFlags <name="Flags", fgcolor=cLtBlue>;
+        
+        // star name
+        int nameLen <fgcolor=cPurple, hidden=true>;
+        LittleEndian();
+        wchar_t name[nameLen] <name="Name", fgcolor=cPurple>;
+        BigEndian();
+
+       // unknown values
+        int pad_ints_2[5] <bgcolor=cBlack>;
+
+        // star type
+        StarType mType <name="Type", fgcolor=cGreen>;
+
+       // unknown values
+        int pad_ints_3[2] <bgcolor=cBlack>;
+        Vector3 pad_vecs[3] <bgcolor=cBlack>;
+        int pad_ints_4[2] <bgcolor=cBlack>;
+       
+        // planet count
+        unsigned byte planetCount <name="Planet Count", fgcolor=cGreen>;
+    } stars[42010] <optimize=false>;
+
+} file;
+
+/* Known cPlanetRecord fields
+        ResourceKey mKey;
+        --Vector3 mPosition;
+        --StarType mType;
+        TechLevel mTechLevel;
+        --wchar_t name[16];
+        --int mFlags;
+        ResourceKey citizenSpeciesKey;
+        int mStarterWorldId;
+        int empireID;
+        Timestamp lastObservedTime;
+        Timestamp savedGameTimeStamp;
+        int savedGameVersionMajor;
+        int savedGameVersionMinor;
+        --int planetCount;
+*/
