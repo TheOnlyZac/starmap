@@ -34,11 +34,11 @@ class GuiManager {
         window.addEventListener('click', this.onClick.bind(this));
 
         document.querySelectorAll('.panel').forEach((panel) => {
+            console.log(panel);
             panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
             panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
         })
 
-        //window.addEventListener('blur', onBlur.bind(this));
         window.addEventListener('focus', this.onFocus.bind(this));
         
     }
@@ -125,6 +125,10 @@ class GuiManager {
     }
 
     onPanelMouseOut(event) {
+        if (event.relatedTarget && event.relatedTarget.closest('.panel')) {
+          // Mouse is entering a child element of the panel, do nothing
+          return;
+        }
         this.fMouseOnUiPanel = false;
     }
 
