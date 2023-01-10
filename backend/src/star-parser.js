@@ -1,3 +1,4 @@
+'use strict';
 const fs = require('fs');
 
 class Vector3 {
@@ -37,7 +38,7 @@ class StarParser {
                 return;
             }
             console.log(data);
-        })
+        });
     }
 
     deserialize(rawStarData) {
@@ -45,7 +46,7 @@ class StarParser {
         
         let index = 0;
         while (index < rawStarData.byteLength) {
-            const starKey = rawStarData.readIntBE(index, 4);
+            const starKey = rawStarData.readIntBE(index, 4); // probably not actually starkey
             index += 4
 
             // Read unknown values
