@@ -64,7 +64,9 @@ class SceneManager {
         console.log('Populating scene with meshes...');
         meshes.forEach(mesh => {
             this.scene.add(mesh);
+            mesh.updateMatrixWorld();
         });
+        this.scene.updateMatrixWorld()
         console.log('Done.');
     }
 
@@ -79,6 +81,7 @@ class SceneManager {
                 this.scene.remove(child);
             }
         }
+        this.scene.updateMatrixWorld()
         console.log('Done.');
     }
 
@@ -124,6 +127,7 @@ class SceneManager {
 
     raycast(cursor) {
         // Cast ray from camera to pointer to detect stars
+        console.log(this.fEnableRaycasting);
         if (!this.fEnableRaycasting) return;
 
         this.raycaster.setFromCamera(cursor, this.camera);

@@ -10,9 +10,10 @@ const upload = multer();
 const fs = require('fs');
 const StarParser = require('./backend/src/star-parser.js');
 const { response } = require('express');
+const { Server } = require('http');
 
 // Set the port to listen on
-const port = 3000;
+const DEFAULT_PORT = 3000;
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -70,7 +71,7 @@ app.get('/example-star-records', (req, res) => {
         let starRecords;
         try {
             starRecords = deserializeStarRecords(fd);
-        } catch(e) {
+        } catch (e) {
             // handle error deserializing star records
             responseStatus = 500;
             res.send({ status: responseStatus });
@@ -90,7 +91,7 @@ app.get('/example-star-records', (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-    console.log(`Open localhost:${port} in your web browser`);
+app.listen(DEFAULT_PORT, () => {
+    console.log(`Server listening on port ${DEFAULT_PORT}`);
+    console.log(`Open localhost:${DEFAULT_PORT} in your browser`);
 });

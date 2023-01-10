@@ -18,15 +18,6 @@ class GuiManager {
 
         this.fMouseOnUiPanel = false;
 
-        // Disable raycasting while mouse is on ui panels
-        document.querySelector('.panel').addEventListener('mouseover', (event) => {
-            this.fMouseOnUiPanel = false;
-        });
-
-        document.querySelector('.panel').addEventListener('mouseleave', (event) => {
-            this.fMouseOnUiPanel = true;
-        });
-
         document.querySelector('#fullscreen-btn').addEventListener('click', (event) => {
             //todo: support moz and webkit fullscreen requests
             if (document.fullscreenElement) {
@@ -41,6 +32,15 @@ class GuiManager {
 
     bindEventListeners() {
         window.addEventListener('click', this.onClick.bind(this));
+
+        document.querySelectorAll('.panel').forEach((panel) => {
+            panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
+            panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
+        })
+
+        //window.addEventListener('blur', onBlur.bind(this));
+        window.addEventListener('focus', this.onFocus.bind(this));
+        
     }
     
     // Mouse click event handler
@@ -119,6 +119,28 @@ class GuiManager {
             this.propsPanel.style.visibility = 'hidden';
         }
     };
+
+    onPanelMouseEnter(event) {
+        this.fMouseOnUiPanel = true;
+    }
+
+    onPanelMouseOut(event) {
+        this.fMouseOnUiPanel = false;
+    }
+
+    onFocus(event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+        
+        document.querySelectorAll('.panel').forEach((panel) => {
+            if (panel.contains(elementUnderMouse)) {
+                this.fMouseOnUiPanel = true;
+                return;
+            }
+        });
+        this.fMouseOnUiPanel = false;
+    }
 
     showLoadingOverlay() {
         this.tLoadingStarted = new Date().getTime();
