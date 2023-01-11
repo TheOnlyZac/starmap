@@ -48,3 +48,5 @@ There is no randomness in the algorithm which determines the positions of stars,
 Skybox textures by Screaming Brain Studios on OpenGameArt ([source](https://opengameart.org/content/seamless-space-backgrounds))
 
 Fullscreen icon created by kendis lasman on Flaticon ([source](https://www.flaticon.com/free-icons/fullscreen))
+
+Loading spinner icon provided by loadingspinner.io ([source](https://loading.io/css/))

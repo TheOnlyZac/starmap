@@ -4,6 +4,8 @@
 		<meta charset="utf-8">
 		<title>StarMap</title>
 		<link rel="stylesheet" type="text/css" href="css/main.css">
+        <link rel="stylesheet" href="css/jspanel.css">
+        <link rel="stylesheet" href="css/spinner.css">
 
 		<script type="importmap">
 			{
@@ -14,17 +16,20 @@
 				}
 			}
 		</script>
-		
-        <!-- loading jsPanel css -->
-        <link rel="stylesheet" href="css/jspanel.css">
 	</head>
 	<body>
 		<script src="js/jspanel.js"></script>
 		<script type="module" src="js/starmap.js"></script>
 
 		<div id="loading-overlay">
-			<div id="spinner">Loading</div>
+			<div id="spinner" style="display: none;">Loading</div>
+			<div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 		</div>
+
+		<nav id="menu-bar">
+			<li id="file-menu"/>
+		</nav>
+
 		<div id="content">
 			<!-- Fullscreen button -->
 			<div id="fullscreen-btn" class="blurbg"><img src='img/fullscreen.png'/></div> 
