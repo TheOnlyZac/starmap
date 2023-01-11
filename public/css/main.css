@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6 {
     backdrop-filter: blur(5px);
     
     transition: opacity 1.0s;
-    z-index: 5;
+    z-index: 999;
 }
 
 #fullscreen-btn {
@@ -120,7 +120,6 @@ h1, h2, h3, h4, h5, h6 {
 
     color: rgb(220, 220, 220) !important;
     font-family: 'Helvetica', 'Roboto', 'Calibri', 'Courier New', sans-serif;
-    
     /*border: 2px solid rgba(255, 255, 255, 0.5);*/
     border-radius: 2px;
 
@@ -132,15 +131,12 @@ h1, h2, h3, h4, h5, h6 {
     overflow: false;
 }
 
-.panel-content, .jsPanel-content {
-    padding: 8px 12px 8px 12px !important;
-}
-
 .panel * {
     margin: 0;
     padding: 0;
 
     color: rgb(220, 220, 220) !important;
+
     background-color: transparent !important;
 }
 
@@ -162,6 +158,24 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
 
     border: 1px solid rgba(130, 130, 130, 0.50);
+}
+
+
+
+.panel-content, .jsPanel-content {
+    padding: 8px 12px 8px 12px !important;
+}
+
+.jsPanel-hdr {
+    font-weight: bold;
+}
+
+.jsPanel-headerbar {
+    height: fit-content;
+}
+
+.jsPanel-hdr-toolbar {
+    margin-top: none;
 }
 
 .blurbg {

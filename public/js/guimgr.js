@@ -3,7 +3,24 @@ import { enumStarTypes } from './starmgr.js';
 var DISABLE_LOADING_SCREEN = false;
 
 class GuiManager {
+    static panelConfig = {
+        position:    "left-top",
+        snap: true,
+        contentSize: "auto auto",
+        resizeit: false,
+        theme:       "black",
+        headerControls: {
+            'close': 'enable',
+            'maximize': 'remove',
+            'normalize': 'remove',
+            'minimize': 'remove',
+            'smallify': 'remove'
+        },
+        css: 'min-width: 210px'
+    };
+
     constructor() {
+        console.log(GuiManager.panelConfig);
         this.panels = {};
 
         this.fLoading = false;
@@ -18,6 +35,17 @@ class GuiManager {
 
         this.fMouseOnUiPanel = false;
 
+        // Set global callback for creating new panel
+        jsPanel.globalCallbacks = panel => {
+            // Set panel element classes
+            jsPanel.setClass(panel, 'panel');
+            jsPanel.setClass(panel, 'blurbg');
+        };
+
+        // Create upload file panel
+        this.createFileUploadPanel();
+
+        // Add event listener for fullscreen button
         document.querySelector('#fullscreen-btn').addEventListener('click', (event) => {
             //todo: support moz and webkit fullscreen requests
             if (document.fullscreenElement) {
@@ -27,6 +55,7 @@ class GuiManager {
             }
         });
 
+        // Bind event listeners to this object
         this.bindEventListeners();
     }
 
@@ -91,6 +120,7 @@ class GuiManager {
     }
 
     showLoadingOverlay() {
+        this.fLoading = true;
         this.tLoadingStarted = new Date().getTime();
 
         let loadingOverlay = document.querySelector('#loading-overlay');
@@ -99,7 +129,6 @@ class GuiManager {
         spinner.innerHTML = 'Loading';
         loadingOverlay.style.display = 'flex';
         loadingOverlay.style.opacity = 1.0;
-        this.fLoading = true;
     }
 
     hideLoadingOverlay() {
@@ -123,6 +152,18 @@ class GuiManager {
         }, dummyLoadTimeoutMs);
     }
 
+    createFileUploadPanel(t) {
+        const jspanel = jsPanel.create({
+            config: GuiManager.panelConfig,
+            snap: true,
+            headerTitle: 'Upload File',
+            callback: function(panel) {
+                const fileUploadForm = document.querySelector('#file-form');
+                this.content.append(fileUploadForm);
+            }
+        })
+    }
+
     createStarPropsPanel(starRecord, xPos, yPos) {
         // Check if panel already open
         if (this.panels[starRecord.name]) {
@@ -130,35 +171,22 @@ class GuiManager {
             return;
         }
 
+        console.log(this.panelConfig);
+
         const that = this;
         const jspanel = jsPanel.create({
-            position:    "left-top",
-            contentSize: "210 auto",
-            resizeit: false,
-            headerTitle: starRecord.name,
-            theme:       "black",
-            headerControls: {
-                'close': 'enable',
-                'maximize': 'remove',
-                'normalize': 'remove',
-                'minimize': 'remove',
-                'smallify': 'remove'
-            },
+            config: GuiManager.panelConfig,
             position: {
                 offsetX: xPos,
                 offsetY: yPos
             },
+            headerTitle: 'Star Properties',
             callback: function(panel) {
-                // Set UI element class
-                jsPanel.setClass(this, 'panel');
-                jsPanel.setClass(this, 'blurbg');
-                
                 // Bind event listeners
                 this.addEventListener('mouseenter', that.onPanelMouseEnter.bind(that));
                 this.addEventListener('mouseout', that.onPanelMouseOut.bind(that));
                 
                 // Add panel content                
-                let subtitleElement = document.createElement('p')
                 let subtitle;
                 switch (starRecord.type) {
                     case enumStarTypes.GalacticCore:
@@ -202,13 +230,18 @@ class GuiManager {
                         subtitle = "Unknown star type";
                 }
                 
-                subtitleElement.appendChild(document.createTextNode(subtitle));
-                this.addToolbar('header', subtitleElement);
+                // Append star name and type to panel
+                let titleElement = document.createElement('h3');
+                titleElement.append(document.createTextNode(starRecord.name));
+                titleElement.style.fontWeight = 'bold';
+                this.content.append(titleElement);
 
-                //let posXElement = document.createTextNode(starRecord.position.x.toFixed(3));
-                //posXElement.classList.add('value-posx');
-                //this.content.appendChild(posXElement);
+                const subtitleElement = document.createElement('h4');
+                subtitleElement.append(document.createTextNode(subtitle));
+                subtitleElement.style.marginBottom = '8px';
+                this.content.append(subtitleElement);
                 
+                // Append star position to panel
                 const posGrid = document.createElement('div');
                 posGrid.classList.add('panel-grid');
                 
@@ -222,12 +255,7 @@ class GuiManager {
                     posGrid.append(posElement);
                 });
 
-                this.content.append(posGrid);
-                //document.querySelector('.value-posx').innerHTML = starRecord.position.x.toFixed(3);
-                //document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
-                //document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
-                //this.content.append(document.querySelector('.star-position').cloneNode());
-                
+                this.content.append(posGrid);  
             }
         });
 

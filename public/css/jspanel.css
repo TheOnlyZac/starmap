@@ -11,7 +11,7 @@
   border: 0;
   box-sizing: border-box;
   vertical-align: baseline;
-  font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;
+  /*font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;*/
   font-weight: normal;
   display: flex;
   flex-direction: column;
@@ -26,7 +26,7 @@
   border: 0;
   box-sizing: border-box;
   vertical-align: baseline;
-  font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;
+  /*font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;*/
   font-weight: normal;
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
   border: 0;
   box-sizing: border-box;
   vertical-align: baseline;
-  font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;
+  /*font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;*/
   font-weight: normal;
   background: #ffffff;
   color: #000000;
@@ -278,7 +278,7 @@
 }
 
 .jsPanel-replacement {
-  font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;
+  /*font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;*/
   display: flex;
   align-items: center;
   width: 200px;
@@ -415,7 +415,7 @@
   background: lavender;
   border-radius: 0.33rem;
   padding: 0 8px;
-  font-family: monospace;
+  /*font-family: monospace;*/
 }
 .jsPanel-error .jsPanel-content .jsPanel-error-content-separator {
   width: 100%;
