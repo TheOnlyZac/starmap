@@ -14,7 +14,7 @@ An interactive 3D map of the Spore galaxy. The data comes from `stars.db`, which
 
 ### Build app
 
-To build an executable app (Win, MacOS, or Linux) run the `build` script with `npm run build`. Then launch the executable of your choice and open `localhost:3000` in a browser
+Run the build script with `npm run build`. It will produce a standalone Win, MacOS, and Linux executable in the `build` folder.
 
 ## Controls
 

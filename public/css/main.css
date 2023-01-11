@@ -83,7 +83,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 28px;
     height: 28px;
     pointer-events: none;
-    filter: invert(0.75);
+    filter: invert(0.90);
 }
 
 #tooltip {

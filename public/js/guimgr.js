@@ -20,7 +20,6 @@ class GuiManager {
     };
 
     constructor() {
-        console.log(GuiManager.panelConfig);
         this.panels = {};
 
         this.fLoading = false;
@@ -40,6 +39,10 @@ class GuiManager {
             // Set panel element classes
             jsPanel.setClass(panel, 'panel');
             jsPanel.setClass(panel, 'blurbg');
+            
+            // Set mouse event callbacks
+            panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
+            panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
         };
 
         // Create upload file panel
@@ -62,15 +65,18 @@ class GuiManager {
     bindEventListeners() {
         window.addEventListener('click', this.onWindowClick.bind(this));
         window.addEventListener('focus', this.onWindowFocus.bind(this));
+        //window.addEventListener('mousemove', this.onWindowMouseMove.bind(this));
 
+        /* deprecated
         document.querySelectorAll('.panel').forEach((panel) => {
             panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
             panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
-        });
+        })*/
     }
     
     // Mouse click event handler
     onWindowClick(event) {
+        //todo fix
         //if (mouseInput.wasLongClick() | !mouseInput.wasStationaryClick())
         //    return; // abort if long click or mouse moved during click
 
@@ -78,8 +84,6 @@ class GuiManager {
         if (this.pointedObject != null) {
             let starRecord = this.pointedObject.object.userData;
             this.createStarPropsPanel(starRecord, event.x - window.innerWidth/2, event.y - window.innerHeight/2);
-        } else {
-            this.propsPanel.style.visibility = 'hidden';
         }
     };
 
@@ -105,9 +109,11 @@ class GuiManager {
     checkMouseOverUiPanel(x, y) {
         try {
             const elementUnderMouse = document.elementFromPoint(x, y);
-            
+            console.log(elementUnderMouse);
+
             document.querySelectorAll('.panel').forEach((panel) => {
                 if (panel.contains(elementUnderMouse)) {
+                    console.log('yo');
                     this.fMouseOnUiPanel = true;
                     return;
                 }
@@ -170,8 +176,6 @@ class GuiManager {
             //this.panels[starRecord.name].front();
             return;
         }
-
-        console.log(this.panelConfig);
 
         const that = this;
         const jspanel = jsPanel.create({
@@ -260,7 +264,6 @@ class GuiManager {
         });
 
         this.panels[starRecord.name] = jsPanel;
-        console.log(this.panels);
         return jsPanel;
     }
 
@@ -271,7 +274,7 @@ class GuiManager {
             document.querySelector('#loading-overlay').style.display = 'none';
         }
 
-        this.checkMouseOverUiPanel(cursor.x, cursor.y);
+        //this.checkMouseOverUiPanel(cursor.x, cursor.y);
 
         // Update reference to object currently pointed at by mouse cursor
         this.pointedObject = pointedObject;
