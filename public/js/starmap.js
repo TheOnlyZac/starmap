@@ -86,6 +86,7 @@ sceneManager.addMeshes(starManager.meshes);
 
 guiManager.hideLoadingOverlay();
 
+
 // Start render loop
 function render() {
     // Update the scene

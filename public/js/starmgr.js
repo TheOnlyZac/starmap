@@ -16,8 +16,6 @@ const enumStarTypes = Object.freeze({
 	BinaryMM: 12 // Binary M-M (red-red) star system
 });
 
-console.log(enumStarTypes);
-
 class StarManager {
     constructor() {
         this.starRecords = [];

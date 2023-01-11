@@ -114,10 +114,11 @@ h1, h2, h3, h4, h5, h6 {
     align-items: left;
 
     width: 210px;
+    height: fit-content !important;
     margin: 3px;
-    padding: 14px 30px 14px 30px;
+    /*padding: 14px 30px 14px 30px;*/
 
-    color: rgb(220, 220, 220);
+    color: rgb(220, 220, 220) !important;
     font-family: 'Helvetica', 'Roboto', 'Calibri', 'Courier New', sans-serif;
     
     /*border: 2px solid rgba(255, 255, 255, 0.5);*/
@@ -125,12 +126,22 @@ h1, h2, h3, h4, h5, h6 {
 
     box-shadow: 0px 0px 2px rgba(255, 255, 255, 0.1);
 
+    transition: opacity 0.15s, filter 0.3s;
+
     user-select: none;
+    overflow: false;
+}
+
+.panel-content, .jsPanel-content {
+    padding: 8px 12px 8px 12px !important;
 }
 
 .panel * {
     margin: 0;
     padding: 0;
+
+    color: rgb(220, 220, 220) !important;
+    background-color: transparent !important;
 }
 
 .panel-grid {
@@ -140,7 +151,6 @@ h1, h2, h3, h4, h5, h6 {
 
     width: 100%;
     height: 100%;
-    
 }
 
 .panel-grid h1, .panel-grid h2, .panel-grid h3 {
@@ -155,6 +165,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .blurbg {
-    background-color: rgba(7, 7, 10, 0.57);
-    backdrop-filter: blur(5px);
+    color: white;
+    background-color: rgba(7, 7, 10, 0.57) !important;
+    backdrop-filter: blur(5px) !important;
 }

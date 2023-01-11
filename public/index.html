@@ -14,9 +14,14 @@
 				}
 			}
 		</script>
+		
+        <!-- loading jsPanel css -->
+        <link rel="stylesheet" href="css/jspanel.css">
 	</head>
 	<body>
+		<script src="js/jspanel.js"></script>
 		<script type="module" src="js/starmap.js"></script>
+
 		<div id="loading-overlay">
 			<div id="spinner">Loading</div>
 		</div>
@@ -29,8 +34,10 @@
 			
 			<!-- Form to upload cStarRecords prop file -->
 			<form id="file-form" class="panel blurbg" style="display: block">
-				<h3>Upload star records</h1>
-				<input id="file-input" type="file">
+				<div class="panel-content">
+					<h3>Upload star records</h1>
+					<input id="file-input" type="file">
+				</div>
 			</form>
 
 			<!-- Star properties gui panel -->
@@ -42,7 +49,7 @@
 					<p class="panel-label">Star Type</p><p class="panel-value value-type">4</p>
 				</div>
 				<hr/>-->
-				<div class="panel-grid">
+				<div class="panel-grid star-position">
 					<p class="panel-label">X Position</p><p class="panel-value value-posx">1000</p>
 					<p class="panel-label">Y Position</p><p class="panel-value value-posy">2000</p>
 					<p class="panel-label">Z Position</p><p class="panel-value value-posz">3000</p>
