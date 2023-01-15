@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+const STAR_MESH_RADIUS = 0.5;
+
 const enumStarTypes = Object.freeze({
 	None: 0,
 	GalacticCore: 1,
@@ -15,6 +17,12 @@ const enumStarTypes = Object.freeze({
 	BinaryGM: 11, // Binary G-M (yellow-red) star system
 	BinaryMM: 12 // Binary M-M (red-red) star system
 });
+
+// Convert rgb values to hex
+function rgbToHex(r, g, b) {
+    let hex = (r << 16) + (g << 8) + b;
+    return hex;
+}
 
 class StarManager {
     constructor() {
@@ -35,7 +43,7 @@ class StarManager {
                 name: record.name,
                 position: position,
                 type: record.type,
-                unk: record.unk10
+                unk: record.unk2
             });
         });
     
@@ -47,7 +55,7 @@ class StarManager {
         const blackHoleMaterial =   new THREE.MeshBasicMaterial({ color: 0x0000FF });
         const protoDiskMaterial =   new THREE.MeshBasicMaterial({ color: 0xFF0000 });
     
-        const starGeometry = new THREE.SphereGeometry(0.3, 6, 4);
+        const starGeometry = new THREE.SphereGeometry(STAR_MESH_RADIUS, 6, 4);
     
         stars.forEach(star => {
             let material = whiteStarMaterial;
@@ -79,7 +87,9 @@ class StarManager {
                     break;
             }
     
-            //material = new THREE.MeshBasicMaterial({ color: star.color }); // temp
+            //console.log(star.unk.toString(16), star.unk >> 4 && 0xff, star.unk >> 2 && 0xff, star.unk && 0xff) // temp
+            //material = new THREE.MeshBasicMaterial({ color: rgbToHex(star.unk >> 4 && 0xff, star.unk >> 2 && 0xff, star.unk && 0xff) }); // temp
+
             const mesh = new THREE.Mesh(starGeometry, material);
             mesh.position.set(star.position.x, star.position.z * 2, -star.position.y);
             mesh.userData = star;

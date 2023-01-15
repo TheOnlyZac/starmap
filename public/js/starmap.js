@@ -55,12 +55,6 @@ function uploadStarRecordsFile(file) {
         guiManager.hideLoadingOverlay();
 }
 
-// Convert rgb values to hex
-function rgbToHex(r, g, b) {
-    let hex = (r << 16) + (g << 8) + b;
-    return hex;
-}
-
 // Setup key input
 document.addEventListener('keydown', (event) => {
     switch (event.key) {

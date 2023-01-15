@@ -9,8 +9,6 @@ const upload = multer();
 
 const fs = require('fs');
 const StarParser = require('./backend/src/star-parser.js');
-const { response } = require('express');
-const { Server } = require('http');
 
 // Set the port to listen on
 const DEFAULT_PORT = 3000;
