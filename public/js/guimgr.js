@@ -16,7 +16,9 @@ class GuiManager {
             'minimize': 'remove',
             'smallify': 'remove'
         },
-        css: 'min-width: 210px'
+        css: {
+            content: 'panel-content'
+        }
     };
 
     constructor() {
@@ -109,11 +111,9 @@ class GuiManager {
     checkMouseOverUiPanel(x, y) {
         try {
             const elementUnderMouse = document.elementFromPoint(x, y);
-            console.log(elementUnderMouse);
 
             document.querySelectorAll('.panel').forEach((panel) => {
                 if (panel.contains(elementUnderMouse)) {
-                    console.log('yo');
                     this.fMouseOnUiPanel = true;
                     return;
                 }
@@ -122,7 +122,6 @@ class GuiManager {
         } catch (e) {
             // pass
         }
-        console.log(this.fMouseOnUiPanel);
     }
 
     showLoadingOverlay() {
@@ -180,12 +179,24 @@ class GuiManager {
         const that = this;
         const jspanel = jsPanel.create({
             config: GuiManager.panelConfig,
+
             position: {
                 offsetX: xPos,
                 offsetY: yPos
             },
+
             headerTitle: 'Star Properties',
+            data: starRecord,
+
+            onclosed: function(panel) {
+                that.fMouseOnUiPanel = false;
+                delete that.panels[panel.options.data.name];
+            },
+
             callback: function(panel) {
+                console.log(panel.options.data);
+                that.fMouseOnUiPanel = true;
+
                 // Bind event listeners
                 this.addEventListener('mouseenter', that.onPanelMouseEnter.bind(that));
                 this.addEventListener('mouseout', that.onPanelMouseOut.bind(that));
@@ -305,8 +316,7 @@ class GuiManager {
         }
 
         // Check if cursor is pointing at an object
-        if (this.pointedObject != null) {
-            //console.log(this.pointedObject);
+        if (this.pointedObject != null && !this.fMouseOnUiPanel) {
             // Show tooltip with star name on mouseover
             let starName = this.pointedObject.object.userData.name;
             this.tooltip.style.visibility = 'visible';
