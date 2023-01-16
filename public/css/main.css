@@ -34,6 +34,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 4px 0px 4px 0px;
 }
 
+p {
+    margin: 0;
+}
+
 /* GUI */
 #loading-overlay {
     display: flex;
@@ -50,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 
     background-color: rgba(25, 40, 60, 0.9);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
     
     transition: opacity 1.0s;
     z-index: 999;
@@ -160,11 +164,9 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid rgba(130, 130, 130, 0.50);
 }
 
-
-
 .panel-content, .jsPanel-content {
-    padding: 8px 12px 8px 12px !important;
-    min-width: 210px;
+    padding: 2px 12px 8px 12px !important;
+    min-width: 250px;
 }
 
 .jsPanel-hdr {

@@ -185,7 +185,7 @@ class GuiManager {
                 offsetY: yPos
             },
 
-            headerTitle: 'Star Properties',
+            headerTitle: 'Star Record',
             data: starRecord,
 
             onclosed: function(panel) {
@@ -246,16 +246,17 @@ class GuiManager {
                 }
                 
                 // Append star name and type to panel
-                let titleElement = document.createElement('h3');
+                let titleElement = document.createElement('h1');
                 titleElement.append(document.createTextNode(starRecord.name));
                 titleElement.style.fontWeight = 'bold';
                 this.content.append(titleElement);
 
-                const subtitleElement = document.createElement('h4');
+                const subtitleElement = document.createElement('p');
                 subtitleElement.append(document.createTextNode(subtitle));
-                subtitleElement.style.marginBottom = '8px';
                 this.content.append(subtitleElement);
                 
+                this.content.append(document.createElement('hr'));
+
                 // Append star position to panel
                 const posGrid = document.createElement('div');
                 posGrid.classList.add('panel-grid');
