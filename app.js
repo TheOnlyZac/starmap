@@ -25,7 +25,7 @@ fs.readFile('stars.db', (err, fd) => {
 
 
 // Set the port to listen on
-const DEFAULT_PORT = 3000;
+const DEFAULT_PORT = 4200;
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));

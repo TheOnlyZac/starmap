@@ -10,7 +10,7 @@ An interactive 3D map of the Spore galaxy. The data comes from `stars.db`, which
 1. Clone the repo
 2. Install dependencies with `npm install`
 3. Start the server with `npm start`
-3. Open `localhost:3000` in a browser
+3. Open `localhost:4200` in a browser
 
 ### Build app
 
