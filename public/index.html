@@ -4,6 +4,8 @@
 		<meta charset="utf-8">
 		<title>StarMap</title>
 		<link rel="stylesheet" type="text/css" href="css/main.css">
+        <link rel="stylesheet" href="css/jspanel.css">
+        <link rel="stylesheet" href="css/spinner.css">
 
 		<script type="importmap">
 			{
@@ -16,20 +18,24 @@
 		</script>
 	</head>
 	<body>
+		<script src="js/jspanel.js"></script>
 		<script type="module" src="js/starmap.js"></script>
+
 		<div id="loading-overlay">
-			<div id="spinner">Loading</div>
+			<div id="spinner" style="display: none;">Loading</div>
+			<div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 		</div>
+
 		<div id="content">
 			<!-- Fullscreen button -->
 			<div id="fullscreen-btn" class="blurbg"><img src='img/fullscreen.png'/></div> 
 
 			<!-- Star name mouse tooltip -->
-			<div id="tooltip">Galactic Core</div>
+			<div id="tooltip" style="visibility: hidden;">Galactic Core</div>
 			
-			<!-- Form to upload cStarRecords prop file -->
-			<form id="file-form" class="panel blurbg" style="display: block">
-				<h3>Upload star records</h1>
+			<!-- Form to upload stars.db file -->
+			<form id="file-form" style="display: block">
+				<h3>Select stars.db file</h3>
 				<input id="file-input" type="file">
 			</form>
 
@@ -42,7 +48,7 @@
 					<p class="panel-label">Star Type</p><p class="panel-value value-type">4</p>
 				</div>
 				<hr/>-->
-				<div class="panel-grid">
+				<div class="panel-grid star-position">
 					<p class="panel-label">X Position</p><p class="panel-value value-posx">1000</p>
 					<p class="panel-label">Y Position</p><p class="panel-value value-posy">2000</p>
 					<p class="panel-label">Z Position</p><p class="panel-value value-posz">3000</p>

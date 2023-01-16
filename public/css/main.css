@@ -34,6 +34,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 4px 0px 4px 0px;
 }
 
+p {
+    margin: 0;
+}
+
 /* GUI */
 #loading-overlay {
     display: flex;
@@ -50,10 +54,10 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 
     background-color: rgba(25, 40, 60, 0.9);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
     
     transition: opacity 1.0s;
-    z-index: 5;
+    z-index: 999;
 }
 
 #fullscreen-btn {
@@ -83,7 +87,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 28px;
     height: 28px;
     pointer-events: none;
-    filter: invert(0.75);
+    filter: invert(0.90);
 }
 
 #tooltip {
@@ -114,23 +118,30 @@ h1, h2, h3, h4, h5, h6 {
     align-items: left;
 
     width: 210px;
+    height: fit-content !important;
     margin: 3px;
-    padding: 14px 30px 14px 30px;
+    /*padding: 14px 30px 14px 30px;*/
 
-    color: rgb(220, 220, 220);
+    color: rgb(220, 220, 220) !important;
     font-family: 'Helvetica', 'Roboto', 'Calibri', 'Courier New', sans-serif;
-    
     /*border: 2px solid rgba(255, 255, 255, 0.5);*/
     border-radius: 2px;
 
     box-shadow: 0px 0px 2px rgba(255, 255, 255, 0.1);
 
+    transition: opacity 0.15s, filter 0.3s;
+
     user-select: none;
+    overflow: false;
 }
 
 .panel * {
     margin: 0;
     padding: 0;
+
+    color: rgb(220, 220, 220) !important;
+
+    background-color: transparent !important;
 }
 
 .panel-grid {
@@ -140,7 +151,6 @@ h1, h2, h3, h4, h5, h6 {
 
     width: 100%;
     height: 100%;
-    
 }
 
 .panel-grid h1, .panel-grid h2, .panel-grid h3 {
@@ -154,7 +164,25 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid rgba(130, 130, 130, 0.50);
 }
 
+.panel-content, .jsPanel-content {
+    padding: 2px 12px 8px 12px !important;
+    min-width: 250px;
+}
+
+.jsPanel-hdr {
+    font-weight: bold;
+}
+
+.jsPanel-headerbar {
+    height: fit-content;
+}
+
+.jsPanel-hdr-toolbar {
+    margin-top: none;
+}
+
 .blurbg {
-    background-color: rgba(7, 7, 10, 0.57);
-    backdrop-filter: blur(5px);
+    color: white;
+    background-color: rgba(7, 7, 10, 0.57) !important;
+    backdrop-filter: blur(5px) !important;
 }

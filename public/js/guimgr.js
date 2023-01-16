@@ -1,11 +1,29 @@
 import { enumStarTypes } from './starmgr.js';
 
-console.log(enumStarTypes);
-
 var DISABLE_LOADING_SCREEN = false;
 
 class GuiManager {
+    static panelConfig = {
+        position:    "left-top",
+        snap: true,
+        contentSize: "auto auto",
+        resizeit: false,
+        theme:       "black",
+        headerControls: {
+            'close': 'enable',
+            'maximize': 'remove',
+            'normalize': 'remove',
+            'minimize': 'remove',
+            'smallify': 'remove'
+        },
+        css: {
+            content: 'panel-content'
+        }
+    };
+
     constructor() {
+        this.panels = {};
+
         this.fLoading = false;
         this.tLastSpinnerUpdate = 0; // time spinner was last updated
         this.tLoadingStarted = 0; // time the last load was initiated
@@ -18,6 +36,21 @@ class GuiManager {
 
         this.fMouseOnUiPanel = false;
 
+        // Set global callback for creating new panel
+        jsPanel.globalCallbacks = panel => {
+            // Set panel element classes
+            jsPanel.setClass(panel, 'panel');
+            jsPanel.setClass(panel, 'blurbg');
+            
+            // Set mouse event callbacks
+            panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
+            panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
+        };
+
+        // Create upload file panel
+        this.createFileUploadPanel();
+
+        // Add event listener for fullscreen button
         document.querySelector('#fullscreen-btn').addEventListener('click', (event) => {
             //todo: support moz and webkit fullscreen requests
             if (document.fullscreenElement) {
@@ -27,96 +60,32 @@ class GuiManager {
             }
         });
 
+        // Bind event listeners to this object
         this.bindEventListeners();
     }
 
     bindEventListeners() {
-        window.addEventListener('click', this.onClick.bind(this));
+        window.addEventListener('click', this.onWindowClick.bind(this));
+        window.addEventListener('focus', this.onWindowFocus.bind(this));
+        //window.addEventListener('mousemove', this.onWindowMouseMove.bind(this));
 
+        /* deprecated
         document.querySelectorAll('.panel').forEach((panel) => {
-            console.log(panel);
             panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
             panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
-        })
-
-        window.addEventListener('focus', this.onFocus.bind(this));
-        
+        })*/
     }
     
     // Mouse click event handler
-    onClick(event) {
+    onWindowClick(event) {
+        //todo fix
         //if (mouseInput.wasLongClick() | !mouseInput.wasStationaryClick())
         //    return; // abort if long click or mouse moved during click
 
         // Show props panel for star pointed at by mouse cursor
         if (this.pointedObject != null) {
             let starRecord = this.pointedObject.object.userData;
-            document.querySelector('.value-name').innerHTML = starRecord.name;
-
-            let subtitleElement = document.querySelector('.panel-subtitle');
-            let subtitle;
-            switch (starRecord.type) {
-                case enumStarTypes.GalacticCore:
-                    subtitle = "Supermassive black hole";
-                    break;
-                case enumStarTypes.BlackHole:
-                    subtitle = "Black hole";
-                    break;
-                case enumStarTypes.ProtoPlanetary:
-                    subtitle = "Proto-planetary disk";
-                    break;
-                case enumStarTypes.StarG:
-                    subtitle = 'Yellow star system';
-                    break;
-                case enumStarTypes.StarO:
-                    subtitle = 'Blue star system';
-                    break;
-                case enumStarTypes.StarM:
-                    subtitle = 'Red star system';
-                    break;
-                case enumStarTypes.BinaryOO:
-                    subtitle = 'Blue-blue binary system';
-                    break;
-                case enumStarTypes.BinaryOM:
-                    subtitle = 'Blue-red binary system';
-                    break;
-                case enumStarTypes.BinaryOG:
-                    subtitle = 'Blue-yellow binary system';
-                    break;
-                case enumStarTypes.BinaryGG:
-                    subtitle = 'Yellow-yellow binary system';
-                    break;
-                case enumStarTypes.BinaryGM:
-                    subtitle = 'Yellow-red binary system';
-                    break;
-                case enumStarTypes.BinaryMM:
-                    subtitle = 'Red-red binary system';
-                    break;
-                default:
-                    console.error("Unrecognized star type", starRecord.type);
-                    subtitle = "Unknown star type";
-            }
-            subtitleElement.innerHTML = subtitle;
-
-            document.querySelector('.value-posx').innerHTML = starRecord.position.x.toFixed(3);
-            document.querySelector('.value-posy').innerHTML = starRecord.position.y.toFixed(3);
-            document.querySelector('.value-posz').innerHTML = starRecord.position.z.toFixed(3);
-            this.propsPanel.style.visibility = 'visible';
-
-            /* todo: double click star to focus on it 
-            if (mouseInput.wasDoubleClick() && !sceneManager.fCameraGliding) {
-                // need to convert starrecord position to a three vec3 so the math is mathing
-                let starPos = new THREE.Vector3(starRecord.position.x, starRecord.position.y * 2, starRecord.position.z)
-                let offset = new THREE.Vector3(0, 10, 0);
-                let target = starPos.add(offset);
-
-                console.log(starRecord.position, target);
-
-                //sceneManager.controls.target.set(starPos.x, starPos.y*2, starPos.z);
-                sceneManager.glideCameraToward(target)
-            } */
-        } else {
-            this.propsPanel.style.visibility = 'hidden';
+            this.createStarPropsPanel(starRecord, event.x - window.innerWidth/2, event.y - window.innerHeight/2);
         }
     };
 
@@ -132,21 +101,31 @@ class GuiManager {
         this.fMouseOnUiPanel = false;
     }
 
-    onFocus(event) {
+    onWindowFocus(event) {
         const mouseX = event.clientX;
         const mouseY = event.clientY;
-        const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
-        
-        document.querySelectorAll('.panel').forEach((panel) => {
-            if (panel.contains(elementUnderMouse)) {
-                this.fMouseOnUiPanel = true;
-                return;
-            }
-        });
-        this.fMouseOnUiPanel = false;
+
+        this.checkMouseOverUiPanel(mouseX, mouseY);
+    }
+
+    checkMouseOverUiPanel(x, y) {
+        try {
+            const elementUnderMouse = document.elementFromPoint(x, y);
+
+            document.querySelectorAll('.panel').forEach((panel) => {
+                if (panel.contains(elementUnderMouse)) {
+                    this.fMouseOnUiPanel = true;
+                    return;
+                }
+            });
+            this.fMouseOnUiPanel = false;
+        } catch (e) {
+            // pass
+        }
     }
 
     showLoadingOverlay() {
+        this.fLoading = true;
         this.tLoadingStarted = new Date().getTime();
 
         let loadingOverlay = document.querySelector('#loading-overlay');
@@ -155,7 +134,6 @@ class GuiManager {
         spinner.innerHTML = 'Loading';
         loadingOverlay.style.display = 'flex';
         loadingOverlay.style.opacity = 1.0;
-        this.fLoading = true;
     }
 
     hideLoadingOverlay() {
@@ -179,12 +157,136 @@ class GuiManager {
         }, dummyLoadTimeoutMs);
     }
 
+    createFileUploadPanel(t) {
+        const jspanel = jsPanel.create({
+            config: GuiManager.panelConfig,
+            snap: true,
+            headerTitle: 'Upload File',
+            callback: function(panel) {
+                const fileUploadForm = document.querySelector('#file-form');
+                this.content.append(fileUploadForm);
+            }
+        })
+    }
+
+    createStarPropsPanel(starRecord, xPos, yPos) {
+        // Check if panel already open
+        if (this.panels[starRecord.name]) {
+            //this.panels[starRecord.name].front();
+            return;
+        }
+
+        const that = this;
+        const jspanel = jsPanel.create({
+            config: GuiManager.panelConfig,
+
+            position: {
+                offsetX: xPos,
+                offsetY: yPos
+            },
+
+            headerTitle: 'Star Record',
+            data: starRecord,
+
+            onclosed: function(panel) {
+                that.fMouseOnUiPanel = false;
+                delete that.panels[panel.options.data.name];
+            },
+
+            callback: function(panel) {
+                console.log(panel.options.data);
+                that.fMouseOnUiPanel = true;
+
+                // Bind event listeners
+                this.addEventListener('mouseenter', that.onPanelMouseEnter.bind(that));
+                this.addEventListener('mouseout', that.onPanelMouseOut.bind(that));
+                
+                // Add panel content                
+                let subtitle;
+                switch (starRecord.type) {
+                    case enumStarTypes.GalacticCore:
+                        subtitle = "Supermassive black hole";
+                        break;
+                    case enumStarTypes.BlackHole:
+                        subtitle = "Black hole";
+                        break;
+                    case enumStarTypes.ProtoPlanetary:
+                        subtitle = "Proto-planetary disk";
+                        break;
+                    case enumStarTypes.StarG:
+                        subtitle = 'Yellow star system';
+                        break;
+                    case enumStarTypes.StarO:
+                        subtitle = 'Blue star system';
+                        break;
+                    case enumStarTypes.StarM:
+                        subtitle = 'Red star system';
+                        break;
+                    case enumStarTypes.BinaryOO:
+                        subtitle = 'Blue-blue binary system';
+                        break;
+                    case enumStarTypes.BinaryOM:
+                        subtitle = 'Blue-red binary system';
+                        break;
+                    case enumStarTypes.BinaryOG:
+                        subtitle = 'Blue-yellow binary system';
+                        break;
+                    case enumStarTypes.BinaryGG:
+                        subtitle = 'Yellow-yellow binary system';
+                        break;
+                    case enumStarTypes.BinaryGM:
+                        subtitle = 'Yellow-red binary system';
+                        break;
+                    case enumStarTypes.BinaryMM:
+                        subtitle = 'Red-red binary system';
+                        break;
+                    default:
+                        console.error("Unrecognized star type", starRecord.type);
+                        subtitle = "Unknown star type";
+                }
+                
+                // Append star name and type to panel
+                let titleElement = document.createElement('h1');
+                titleElement.append(document.createTextNode(starRecord.name));
+                titleElement.style.fontWeight = 'bold';
+                this.content.append(titleElement);
+
+                const subtitleElement = document.createElement('p');
+                subtitleElement.append(document.createTextNode(subtitle));
+                this.content.append(subtitleElement);
+                
+                this.content.append(document.createElement('hr'));
+
+                // Append star position to panel
+                const posGrid = document.createElement('div');
+                posGrid.classList.add('panel-grid');
+                
+                ['x', 'y', 'z'].forEach(axis => {
+                    const labelElement = document.createElement('p');
+                    labelElement.append(document.createTextNode(axis.toUpperCase() + ' Position'));
+                    posGrid.append(labelElement);
+
+                    const posElement = document.createElement('p');
+                    posElement.append(document.createTextNode(starRecord.position[axis].toFixed(3)));
+                    posGrid.append(posElement);
+                });
+
+                this.content.append(posGrid);  
+            }
+        });
+
+        this.panels[starRecord.name] = jsPanel;
+        return jsPanel;
+    }
+
     update(cursor, pointedObject) {
         // Debug flag to disable the loading screen
         if (DISABLE_LOADING_SCREEN) {
             this.fLoading = false;
             document.querySelector('#loading-overlay').style.display = 'none';
         }
+
+        //this.checkMouseOverUiPanel(cursor.x, cursor.y);
 
         // Update reference to object currently pointed at by mouse cursor
         this.pointedObject = pointedObject;
@@ -215,8 +317,7 @@ class GuiManager {
         }
 
         // Check if cursor is pointing at an object
-        if (this.pointedObject != null) {
-            //console.log(this.pointedObject);
+        if (this.pointedObject != null && !this.fMouseOnUiPanel) {
             // Show tooltip with star name on mouseover
             let starName = this.pointedObject.object.userData.name;
             this.tooltip.style.visibility = 'visible';

@@ -3,3 +3,5 @@ build
 build/*
 out
 out/*
+stars.db
+decompressed/*

@@ -127,7 +127,6 @@ class SceneManager {
 
     raycast(cursor) {
         // Cast ray from camera to pointer to detect stars
-        console.log(this.fEnableRaycasting);
         if (!this.fEnableRaycasting) return;
 
         this.raycaster.setFromCamera(cursor, this.camera);

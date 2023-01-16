@@ -41,24 +41,19 @@ function uploadStarRecordsFile(file) {
 
     const formData = new FormData();
     formData.append('file', file);
-    api.post('upload-star-records', formData)
+    api.post('upload-stars-db', formData)
         .then((response) => {
             starManager.starRecords = response.data;
             sceneManager.clearMeshes();
             starManager.generateMeshes();
             sceneManager.addMeshes(starManager.meshes);
+            guiManager.hideLoadingOverlay();
         })
         .catch((e) => {
             console.error(e);
+            guiManager.hideLoadingOverlay();
         });
     
-        guiManager.hideLoadingOverlay();
-}
-
-// Convert rgb values to hex
-function rgbToHex(r, g, b) {
-    let hex = (r << 16) + (g << 8) + b;
-    return hex;
 }
 
 // Setup key input
@@ -76,7 +71,7 @@ document.addEventListener('keydown', (event) => {
 // Request sample star records and set up meshes in scene manager
 guiManager.showLoadingOverlay();
 
-const res = await api.get('example-star-records');
+const res = await api.get('get-example-stars');
 const exampleStarRecords = res.data;
 starManager.starRecords = exampleStarRecords;
 
@@ -85,6 +80,7 @@ starManager.generateMeshes();
 sceneManager.addMeshes(starManager.meshes);
 
 guiManager.hideLoadingOverlay();
+
 
 // Start render loop
 function render() {

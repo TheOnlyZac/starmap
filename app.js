@@ -9,8 +9,20 @@ const upload = multer();
 
 const fs = require('fs');
 const StarParser = require('./backend/src/star-parser.js');
-const { response } = require('express');
-const { Server } = require('http');
+
+// Test parsing stars.db
+fs.readFile('stars.db', (err, fd) => {
+    // Handle error reading file
+    if (err) {
+        console.error(err);
+        return;
+    }
+
+    const starParser = new StarParser();
+    starParser.unpackStarRecordsFromDbpf(Buffer.from(fd));
+
+});
+
 
 // Set the port to listen on
 const DEFAULT_PORT = 3000;
@@ -28,8 +40,8 @@ app.get('/', (req, res) => {
 
 function deserializeStarRecords(data) {
     // Process the data as needed
-    let starParser = new StarParser();
-    const parsedData = starParser.deserialize(data);
+    const starParser = new StarParser();
+    const parsedData = starParser.deserializeStarRecords(data);
     return parsedData;
 }
 
@@ -44,11 +56,37 @@ app.post('/upload-star-records', upload.single('file'), (req, res) => {
     // Deserialize star records
     const starRecords = deserializeStarRecords(buffer);
 
-    // Send a response to the client
-    res.send({ status: 'success', data: starRecords });
+    // Send OK response to the client
+    res.send({ status: '200', data: starRecords });
 });
 
-app.get('/example-star-records', (req, res) => {
+app.post('/upload-stars-db', upload.single('file'), (req, res) => {
+    try {
+        // Access file data in request body
+        const file = req.file;
+
+        // Read binary data in file object
+        const buffer = file.buffer;
+
+        // Unpack star records from dbpf
+        const starParser = new StarParser();
+        const serializedStarRecords = starParser.unpackStarRecordsFromDbpf(buffer);        
+        const starRecords = starParser.deserializeStarRecords(serializedStarRecords);
+
+        if (serializedStarRecords == null || starRecords.length == 0) {
+            res.sendStatus(204); // no content
+            return;
+        }
+        
+        // Send OK response to client
+        res.send({ status: '200', data: starRecords });
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500); // internal server error
+    }
+});
+
+app.get('/get-example-stars', (req, res) => {
     // Open example star record file
     let fname = path.join(__dirname, 'backend/bin/stars.bin');
     fs.readFile(fname, (err, fd) => {
