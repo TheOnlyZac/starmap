@@ -10,7 +10,7 @@
     "qfs-compression": "^0.2.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.0.3"
   },
   "scripts": {
     "start": "node app.js",
