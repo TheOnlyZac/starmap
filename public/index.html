@@ -28,14 +28,23 @@
 
 		<div id="content">
 			<!-- Fullscreen button -->
-			<div id="fullscreen-btn" class="blurbg"><img src='img/fullscreen.png'/></div> 
+			<div id="fullscreen-btn" class="blurbg"><img src='img/fullscreen.png'/></div>
 
 			<!-- Star name mouse tooltip -->
 			<div id="tooltip" style="visibility: hidden;">Galactic Core</div>
-			
+
 			<!-- Form to upload stars.db file -->
 			<form id="file-form" style="display: block">
-				<h3>Select stars.db file</h3>
+				<p>
+					This is a map of the galaxy from the 2008 game <a href="https://en.wikipedia.org/wiki/Spore_(2008_video_game)">Spore</a>. Each dot represents a single star system.
+				</p>
+				<p>
+					The map is generated from the stars.db file, which is a database containing the positions and properties of all the stars in the game. This file is procedurally generated the first time you start the game.
+				</p>
+				<p>
+					If you have Spore, you can upload your own stars.db file to see the map of your galaxy. The position of the stars will be the same, but their properties (name, color, etc.) are different for everyone.
+				</p>
+				<h3>Upload stars.db file</h3>
 				<input id="file-input" type="file">
 			</form>
 

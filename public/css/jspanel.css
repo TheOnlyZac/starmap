@@ -8,9 +8,11 @@
  * @github https://github.com/Flyer53/jsPanel4.git
  */
 .jsPanel {
+  position: fixed;
   border: 0;
   box-sizing: border-box;
   vertical-align: baseline;
+  max-width: 555px;
   /*font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;*/
   font-weight: normal;
   display: flex;
@@ -38,15 +40,20 @@
   box-sizing: border-box;
   vertical-align: baseline;
   /*font-family: Roboto, "Open Sans", Lato, "Helvetica Neue", Arial, sans-serif;*/
+  font-size: 0.95em;
   font-weight: normal;
   background: #ffffff;
   color: #000000;
-  font-size: 1rem;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
   flex-grow: 1;
 }
+
+.jsPanel-content p {
+  margin: 0.5em 0;
+}
+
 .jsPanel-content pre {
   color: inherit;
 }

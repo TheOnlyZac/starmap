@@ -30,7 +30,7 @@ class GuiManager {
 
         this.pointedObject = null;
         this.tooltip = document.querySelector('#tooltip');
-        
+
         this.propsPanel = document.querySelector('#properties-panel');
         this.propsPanel.style.visibility = 'hidden'; // start hidden
 
@@ -41,7 +41,7 @@ class GuiManager {
             // Set panel element classes
             jsPanel.setClass(panel, 'panel');
             jsPanel.setClass(panel, 'blurbg');
-            
+
             // Set mouse event callbacks
             panel.addEventListener('mouseenter', this.onPanelMouseEnter.bind(this));
             panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
@@ -75,7 +75,7 @@ class GuiManager {
             panel.addEventListener('mouseout', this.onPanelMouseOut.bind(this));
         })*/
     }
-    
+
     // Mouse click event handler
     onWindowClick(event) {
         //todo fix
@@ -130,7 +130,7 @@ class GuiManager {
 
         let loadingOverlay = document.querySelector('#loading-overlay');
         let spinner = document.querySelector('#spinner');
-        
+
         spinner.innerHTML = 'Loading';
         loadingOverlay.style.display = 'flex';
         loadingOverlay.style.opacity = 1.0;
@@ -146,7 +146,7 @@ class GuiManager {
         setTimeout(() => {
             this.fLoading = false;
             document.querySelector('#spinner').innerHTML = 'Ready!';
-            
+
             let loadingOverlay = document.querySelector('#loading-overlay');
             setTimeout(() => {
                 loadingOverlay.style.opacity = 0.0;
@@ -161,7 +161,7 @@ class GuiManager {
         const jspanel = jsPanel.create({
             config: GuiManager.panelConfig,
             snap: true,
-            headerTitle: 'Upload File',
+            headerTitle: 'StarMap',
             callback: function(panel) {
                 const fileUploadForm = document.querySelector('#file-form');
                 this.content.append(fileUploadForm);
@@ -200,8 +200,8 @@ class GuiManager {
                 // Bind event listeners
                 this.addEventListener('mouseenter', that.onPanelMouseEnter.bind(that));
                 this.addEventListener('mouseout', that.onPanelMouseOut.bind(that));
-                
-                // Add panel content                
+
+                // Add panel content
                 let subtitle;
                 switch (starRecord.type) {
                     case enumStarTypes.GalacticCore:
@@ -244,7 +244,7 @@ class GuiManager {
                         console.error("Unrecognized star type", starRecord.type);
                         subtitle = "Unknown star type";
                 }
-                
+
                 // Append star name and type to panel
                 let titleElement = document.createElement('h1');
                 titleElement.append(document.createTextNode(starRecord.name));
@@ -254,13 +254,13 @@ class GuiManager {
                 const subtitleElement = document.createElement('p');
                 subtitleElement.append(document.createTextNode(subtitle));
                 this.content.append(subtitleElement);
-                
+
                 this.content.append(document.createElement('hr'));
 
                 // Append star position to panel
                 const posGrid = document.createElement('div');
                 posGrid.classList.add('panel-grid');
-                
+
                 ['x', 'y', 'z'].forEach(axis => {
                     const labelElement = document.createElement('p');
                     labelElement.append(document.createTextNode(axis.toUpperCase() + ' Position'));
@@ -271,7 +271,7 @@ class GuiManager {
                     posGrid.append(posElement);
                 });
 
-                this.content.append(posGrid);  
+                this.content.append(posGrid);
             }
         });
 
@@ -295,7 +295,7 @@ class GuiManager {
         if (this.fLoading) {
             let now = new Date().getTime();
             let dtSpinnerUpdate = now - this.tLastSpinnerUpdate;
-            
+
             if (dtSpinnerUpdate > 500) {
                 this.tLastSpinnerUpdate = now;
                 let spinner = document.querySelector('#spinner');
@@ -326,7 +326,7 @@ class GuiManager {
             this.tooltip.style.left = (cursor.x + 1) / 2 * window.innerWidth + 5 + 'px';
             this.tooltip.style.top = (-cursor.y + 1) / 2 * window.innerHeight - 30 + 'px';
             this.tooltip.innerHTML = starName;
-    
+
             // Set the cursor icon to the one with the little question mark
             document.body.style.cursor = 'help';
         } else {

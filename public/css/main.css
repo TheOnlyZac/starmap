@@ -7,6 +7,8 @@ html, body {
 
 body {
     font-family: arial, sans-serif;
+
+    overflow: hidden;
 }
 
 canvas {
@@ -20,7 +22,7 @@ canvas {
     position: absolute;
     width: 100%;
     height: 100%;
-    
+
     color: white;
 
     pointer-events: none;
@@ -47,7 +49,7 @@ p {
     position: absolute;
     width: 100%;
     height: 100%;
-    
+
     color: white;
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-size: 18px;
@@ -55,7 +57,7 @@ p {
 
     background-color: rgba(25, 40, 60, 0.9);
     backdrop-filter: blur(10px);
-    
+
     transition: opacity 1.0s;
     z-index: 999;
 }
@@ -88,6 +90,12 @@ p {
     height: 28px;
     pointer-events: none;
     filter: invert(0.90);
+}
+
+@media screen and (max-width: 768px) {
+    #fullscreen-btn {
+        display: none;
+    }
 }
 
 #tooltip {
