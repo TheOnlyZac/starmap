@@ -1,4 +1,4 @@
-const API_URL = `http://zacbox.app/api/starmap/`;
+const API_URL = `https://zacbox.app/api/starmap/`;
 
 class StarMapAPI {
     async get(endpoint) {
