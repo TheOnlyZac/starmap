@@ -6,7 +6,6 @@
   "dependencies": {
     "express": "^4.18.2",
     "jspanel4": "^4.16.1",
-    "multer": "^1.4.5-lts.1",
     "qfs-compression": "^0.2.1"
   },
   "devDependencies": {
